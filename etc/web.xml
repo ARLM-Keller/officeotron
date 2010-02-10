@@ -4,7 +4,7 @@
 * 
 * Office-o-tron - a web-based ODF document validator for Java(tm)
 * 
-* Copyright (C) 2009 Griffin Brown Digitial Publishing Ltd
+* Copyright (C) 2009-2010 Griffin Brown Digitial Publishing Ltd
 * 
 * This program is free software: you can redistribute it and/or modify it under the terms of
 * the GNU Affero General Public License as published by the Free Software Foundation, either
@@ -25,7 +25,7 @@
 
   <context-param>
     <param-name>temp-folder</param-name>
-    <param-value>C:\officeotron\</param-value>
+    <param-value>C:\officeotron</param-value>
     <description>Where the non-web portions of the application are located</description>
   </context-param>
 
@@ -37,8 +37,14 @@
   
   <context-param>
     <param-name>ooxml-schema-base</param-name>
-    <param-value>http://localhost:8080/officeotron/29500T/</param-value>
+    <param-value>http://localhost:8080/29500T/</param-value>
     <description>Where the OOXML schemas can be found</description>
+  </context-param>
+  
+  <context-param>
+    <param-name>unzip-invocation</param-name>
+    <param-value>cmd /c unzip</param-value>
+    <description>How to invoke info-zip unzip executable on the command line</description>
   </context-param>
 
   <servlet>

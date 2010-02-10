@@ -14,12 +14,12 @@
  * Software distributed under the License is distributed on an "AS IS" basis, WITHOUT WARRANTY
  * OF ANY KIND, either express or implied. See the License for the specific language governing
  * rights and limitations under the License.
- * 
  */
 
 package org.probatron.officeotron;
 
 import java.io.IOException;
+import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.xml.sax.ErrorHandler;
@@ -44,7 +44,7 @@ public class OOXMLValidationSession extends ValidationSession
 
     public void validate()
     {
-        OPCPackage opc = new OPCPackage( this.getSubmission().getCandidateUrl() );
+        OPCPackage opc = new OPCPackage( this.getSubmission().getCandidateUuid() );
         opc.process();
         checkRelationships( opc );
 
@@ -122,7 +122,8 @@ public class OOXMLValidationSession extends ValidationSession
             OOXMLSchemaMapping osm = OOXMLSchemaMap.getMappingForContentType( mt );
             if( osm == null )
             {
-                this.getCommentary().addComment( "Cannot determine schema for this part (\"" + t.getQPartname() + "\")" );
+                this.getCommentary().addComment(
+                        "Cannot determine schema for this part (\"" + t.getQPartname() + "\")" );
 
             }
             else
@@ -159,9 +160,10 @@ public class OOXMLValidationSession extends ValidationSession
                             .getCommentary() );
                     XMLReader parser = getConfiguredParser( osm, h );
 
-                    String packageUrl = this.getSubmission().getCandidateUrl();
+        
+                    UUID uuid = this.getSubmission().getCandidateUuid();
 
-                    String url = "jar:" + packageUrl + "!" + t.getQPartname();
+                    String url = Store.urlForEntry( uuid, t.getQPartname() ).toString();
                     logger
                             .debug( "Validating: " + url + " using schema "
                                     + osm.getSchemaName() );

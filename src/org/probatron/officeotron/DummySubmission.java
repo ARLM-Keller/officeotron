@@ -29,11 +29,11 @@ public class DummySubmission extends Submission
         this.packageUrl = packageUrl;        
     }
 
-    @Override
-    public String getCandidateUrl()
-    {
-        return packageUrl;
-    }
+//    @Override
+//    public String getCandidateUrl()
+//    {
+//        return packageUrl;
+//    }
     
     
 

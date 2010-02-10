@@ -3,7 +3,7 @@
  * 
  * Office-o-tron - a web-based office document validator for Java(tm)
  * 
- * Copyright (c) 2009 Griffin Brown Digital Publishing Ltd.
+ * Copyright (c) 2009-2010 Griffin Brown Digital Publishing Ltd.
  * 
  * All rights reserved world-wide.
  * 
@@ -14,7 +14,6 @@
  * Software distributed under the License is distributed on an "AS IS" basis, WITHOUT WARRANTY
  * OF ANY KIND, either express or implied. See the License for the specific language governing
  * rights and limitations under the License.
- * 
  */
 
 package org.probatron.officeotron;
@@ -22,6 +21,7 @@ package org.probatron.officeotron;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.xml.sax.SAXException;
@@ -33,13 +33,16 @@ public class OPCPackage
     static Logger logger = Logger.getLogger( OPCPackage.class );
     private OOXMLTargetCollection col = new OOXMLTargetCollection();
     private ArrayList< String > foldersProbed = new ArrayList< String >();
-    public String systemId;
+    private UUID uuid;
 
 
-    public OPCPackage( String systemId )
+    // public String systemId;
+
+    public OPCPackage( UUID uuid )
     {
-        logger.trace( "Creating OPC package for resource: " + systemId );
-        this.systemId = systemId;
+        assert uuid != null : "null UUID";
+        this.uuid = uuid;
+        logger.trace( "Creating OPC package for submission: " + uuid );
     }
 
 
@@ -53,7 +56,8 @@ public class OPCPackage
             XMLReader parser = XMLReaderFactory.createXMLReader();
             OOXMLContentTypeHandler h = new OOXMLContentTypeHandler( this.col );
             parser.setContentHandler( h );
-            String ctu = "jar:" + this.systemId + "!/[Content_Types].xml";
+
+            String ctu = Store.urlForEntry( uuid, "[Content_Types].xml" ).toString();
             parser.parse( ctu );
         }
         catch( SAXException e )
@@ -79,8 +83,8 @@ public class OPCPackage
     private void procRels( String entry )
     {
 
-        String partUrl = "jar:" + this.systemId + "!/" + entry;
-        logger.debug( "Retrieving relationship part from OPC package:" + partUrl );
+        String partUrl = Store.urlForEntry( uuid, entry ).toString();
+        logger.debug( "Retrieving relationship part from OPC package:" + partUrl + " (uuid = " + uuid + ")" );
 
         try
         {

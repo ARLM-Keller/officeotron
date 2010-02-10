@@ -3,7 +3,7 @@
  * 
  * Office-o-tron - a web-based office document validator for Java(tm)
  * 
- * Copyright (c) 2009 Griffin Brown Digital Publishing Ltd.
+ * Copyright (c) 2009-2010 Griffin Brown Digital Publishing Ltd.
  * 
  * All rights reserved world-wide.
  * 
@@ -93,7 +93,7 @@ public class Submission
 
                 if( name.equalsIgnoreCase( "candidate" ) )
                 {
-                    this.candidateUuid = Store.put( sis ); // closes stream
+                    this.candidateUuid = Store.putZippedResource( sis ); // closes stream
                     logger.debug( "Persisted candidate item with UUID: " + this.candidateUuid );
 
                 }
@@ -119,7 +119,7 @@ public class Submission
     {
         logger.debug( "Processing direct submission" );
         InputStream sis = request.getInputStream();
-        this.candidateUuid = Store.put( sis ); // closes stream
+        this.candidateUuid = Store.putZippedResource( sis ); // closes stream
 
         Enumeration<String> en = request.getParameterNames();
         while( en.hasMoreElements() )
@@ -140,12 +140,6 @@ public class Submission
     public byte[] getCandidateBytes()
     {
         return Store.getBytes( candidateUuid );
-    }
-
-
-    public String getCandidateUrl()
-    {
-        return Store.asUrlRef( candidateUuid );
     }
 
 
@@ -177,6 +171,12 @@ public class Submission
     public HttpServletRequest getRequest()
     {
         return request;
+    }
+
+
+    public UUID getCandidateUuid()
+    {
+        return candidateUuid;
     }
     
     

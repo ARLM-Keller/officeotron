@@ -3,7 +3,7 @@
  * 
  * Office-o-tron - a web-based office document validator for Java(tm)
  * 
- * Copyright (c) 2009 Griffin Brown Digital Publishing Ltd.
+ * Copyright (c) 2009-2010 Griffin Brown Digital Publishing Ltd.
  * 
  * All rights reserved world-wide.
  * 
@@ -14,7 +14,6 @@
  * Software distributed under the License is distributed on an "AS IS" basis, WITHOUT WARRANTY
  * OF ANY KIND, either express or implied. See the License for the specific language governing
  * rights and limitations under the License.
- * 
  */
 
 package org.probatron.officeotron;
@@ -25,6 +24,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.xml.sax.InputSource;
@@ -36,7 +36,7 @@ import com.thaiopensource.validate.ValidationDriver;
 
 /*
  * * Represents validation of an ODF Package.
- *
+ * 
  * <p>The {@link Submission} object passed to the constructor must represent a candidate that is
  * a potential ODF package (i.e. that has a manifest.xml entry located as expected in the
  * archive.</p> <p>The submission may have further options set:</p> <ul> <li> "check-ids"
@@ -66,7 +66,7 @@ public class ODFValidationSession extends ValidationSession
                     "http://docs.oasis-open.org/office/v1.1/OS/OpenDocument-schema-v1.1.rng" ) );
             schema12 = Utils
                     .derefUrl( new URL(
-                            "jar:http://www.oasis-open.org/committees/download.php/32891/OpenDocument-schema-v1.2-cd02-rev01.zip!/OpenDocument-schema-v1.2-cd02-rev01.rng" ) );
+                            "http://docs.oasis-open.org/office/v1.2/part1/cd04/OpenDocument-schema-v1.2-cd04.rng" ) );
         }
         catch( MalformedURLException e )
         {
@@ -97,8 +97,8 @@ public class ODFValidationSession extends ValidationSession
 
     private ODFPackageManifest parseManifest()
     {
-        String url = this.getSubmission().getCandidateUrl();
-        String manifestUrl = "jar:" + url + "!/META-INF/manifest.xml";
+        UUID uuid = this.getSubmission().getCandidateUuid();
+        String manifestUrl = Store.urlForEntry( uuid, "META-INF/manifest.xml" ).toString();
         ODFPackageManifest mft = new ODFPackageManifest();
         mft.process( manifestUrl );
         return mft;
@@ -110,11 +110,9 @@ public class ODFValidationSession extends ValidationSession
         for( int i = 0; i < mft.getItemRefs().size(); i++ )
         {
             String entry = mft.getItemRefs().get( i );
-            String packageUrl = this.getSubmission().getCandidateUrl();
-            String entryUrl = null;
+            UUID uuid = this.getSubmission().getCandidateUuid();
 
-            entryUrl = "jar:" + packageUrl + "!/" + entry;
-            entryUrl = entryUrl.replaceAll( " ", "%20" );
+            String entryUrl = Store.urlForEntry( uuid, entry ).toString();
 
             logger.debug( "processing " + entryUrl );
             getCommentary().addComment( "Processing manifest entry: " + entry );
@@ -195,7 +193,7 @@ public class ODFValidationSession extends ValidationSession
 
     /**
      * Validates the given ODF XML document.
-     *
+     * 
      * @param url
      *            the URL of the candidate
      * @param ver

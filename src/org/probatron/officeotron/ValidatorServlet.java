@@ -42,7 +42,7 @@ public class ValidatorServlet extends HttpServlet
     {
         // set up log message format, etc.
         String logLvl = System.getProperty( "property://probatron.org/officeotron-log-level" );
-        logLvl = ( logLvl == null ) ? "WARN" : logLvl;
+        logLvl = ( logLvl == null ) ? "TRACE" : logLvl;
 
         Properties p = new Properties();
         p.setProperty( "log4j.rootCategory", logLvl + ", A1" );

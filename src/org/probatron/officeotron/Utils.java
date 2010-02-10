@@ -14,7 +14,6 @@
  * Software distributed under the License is distributed on an "AS IS" basis, WITHOUT WARRANTY
  * OF ANY KIND, either express or implied. See the License for the specific language governing
  * rights and limitations under the License.
- * 
  */
 
 package org.probatron.officeotron;
@@ -31,6 +30,7 @@ import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.xml.sax.Attributes;
@@ -60,9 +60,8 @@ public class Utils
 
 
     /**
-     * Reads all of an InputStream content into a byte array, and closes that
-     * InputStream.
-     *
+     * Reads all of an InputStream content into a byte array, and closes that InputStream.
+     * 
      * @param in
      *            the InputStream to be read
      * @return byte[] its content
@@ -80,8 +79,9 @@ public class Utils
 
     /**
      * GETs the content at a URL and returns it as a byte array.
-     *
-     * @param url - the URL
+     * 
+     * @param url
+     *            - the URL
      * @return a byte array
      */
     public static byte[] derefUrl( URL url )
@@ -109,9 +109,8 @@ public class Utils
 
 
     /**
-     * Writes the bytes in <tt>ba</tt> to the file named <tt>fn</tt>,
-     * creating it if necessary.
-     *
+     * Writes the bytes in <tt>ba</tt> to the file named <tt>fn</tt>, creating it if necessary.
+     * 
      * @param ba
      *            the byte array to be written
      * @param fn
@@ -190,34 +189,34 @@ public class Utils
     }
 
 
-    public static ValidationSession autoCreateValidationSession( Submission sub, String schemaUrlBase )
+    public static ValidationSession autoCreateValidationSession( Submission sub,
+            String schemaUrlBase )
     {
         ValidationSession vs = null;
+        UUID uuid = sub.getCandidateUuid();
 
         try
         {
-            String url = sub.getCandidateUrl();
-
-            String s = "jar:" + url + "!/META-INF/manifest.xml";
-            byte[] ba = Utils.derefUrl( new URL( s ) );
+           
+            String url = Store.urlForEntry( uuid, "META-INF/manifest.xml" ).toString();
+            byte[] ba = Utils.derefUrl( new URL( url ) );
             if( ba != null )
             {
                 logger.info( "Auto detected ODF package" );
                 vs = new ODFValidationSession( sub );
-
             }
             else
             {
-                s = "jar:" + url + "!/_rels/.rels";
-                ba = Utils.derefUrl( new URL( s ) );
+                url = Store.urlForEntry( uuid, "_rels/.rels" ).toString();
+                ba = Utils.derefUrl( new URL( url ) );
                 if( ba != null )
                 {
                     logger.info( "Auto detected OOXML package" );
-                    
+
                     // we need to know where the OOXML schemas are
-                    // this is set in web.xml                   
-                    
-                    vs = new OOXMLValidationSession( sub, schemaUrlBase ); //FIXME
+                    // this is set in web.xml
+
+                    vs = new OOXMLValidationSession( sub, schemaUrlBase ); // FIXME
                 }
             }
         }
@@ -233,7 +232,7 @@ public class Utils
 
     /**
      * Reads all of an InputStream content into an OutputStream, via a buffer.
-     *
+     * 
      * @param in
      *            the InputStream to be read
      * @return int number of bytes read
@@ -246,7 +245,7 @@ public class Utils
 
         long written = 0;
         int count;
-        while( ( count = in.read( buf ) ) != - 1 )
+        while( ( count = in.read( buf ) ) != -1 )
         {
             out.write( buf, 0, count );
             written += count;

@@ -51,12 +51,13 @@ public class OPCPackageTest extends TestCase
     @Override
     protected void setUp() throws Exception
     {
-        opc = new OPCPackage( "file:etc/test-data/maria.xlsx" );
-        opc2 = new OPCPackage( "file:etc/test-data/maria.xlsx" );
-        opc.process();
-        opc2 = new OPCPackage( "file:etc/test-data/torture.pptx" );
-        opc2.process();
-        super.setUp();
+        // TODO: new test code
+//        opc = new OPCPackage( "file:etc/test-data/maria.xlsx" );
+//        opc2 = new OPCPackage( "file:etc/test-data/maria.xlsx" );
+//        opc.process();
+//        opc2 = new OPCPackage( "file:etc/test-data/torture.pptx" );
+//        opc2.process();
+//        super.setUp();
     }
 
 

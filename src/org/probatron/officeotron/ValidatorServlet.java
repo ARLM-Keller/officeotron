@@ -3,7 +3,7 @@
  * 
  * Office-o-tron - a web-based office document validator for Java(tm)
  * 
- * Copyright (c) 2009 Griffin Brown Digital Publishing Ltd.
+ * Copyright (c) 2009-2010 Griffin Brown Digital Publishing Ltd.
  * 
  * All rights reserved world-wide.
  * 
@@ -42,7 +42,7 @@ public class ValidatorServlet extends HttpServlet
     {
         // set up log message format, etc.
         String logLvl = System.getProperty( "property://probatron.org/officeotron-log-level" );
-        logLvl = ( logLvl == null ) ? "TRACE" : logLvl;
+        logLvl = ( logLvl == null ) ? "WARN" : logLvl;
 
         Properties p = new Properties();
         p.setProperty( "log4j.rootCategory", logLvl + ", A1" );

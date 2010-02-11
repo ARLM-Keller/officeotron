@@ -123,7 +123,7 @@ public class OOXMLValidationSession extends ValidationSession
             if( osm == null )
             {
                 this.getCommentary().addComment(
-                        "Cannot determine schema for this part (\"" + t.getQPartname() + "\")" );
+                        "Cannot determine schema for this Target (\"<![CDATA[" + t.getQPartname() + "]]>\")" );
 
             }
             else

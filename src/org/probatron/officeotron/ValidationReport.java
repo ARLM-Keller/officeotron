@@ -3,7 +3,7 @@
  * 
  * Office-o-tron - a web-based office document validator for Java(tm)
  * 
- * Copyright (c) 2009 Griffin Brown Digital Publishing Ltd.
+ * Copyright (c) 2009-2010 Griffin Brown Digital Publishing Ltd.
  * 
  * All rights reserved world-wide.
  * 
@@ -51,9 +51,9 @@ public class ValidationReport
                 .getImplementationVersion();
 
         sb.append( "<div class='meta'>Beginning validation using "
-                + "<a href='http://code.google.com/p/officeotron/'>Office-o-tron</a> " + ver
-                + " at " + new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" ).format( new Date() )
-                + "</div>" );
+                + "<a href='http://code.google.com/p/officeotron/'>Office-o-tron</a> <span class='officeotron-version'>" + ver
+                + "</span> at <span class='timestamp'>" + new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" ).format( new Date() )
+                + "</span></div>" );
     }
 
 

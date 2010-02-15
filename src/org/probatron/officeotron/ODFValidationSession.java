@@ -87,7 +87,7 @@ public class ODFValidationSession extends ValidationSession
 
     public void validate()
     {
-        ODFPackageManifest mft = parseManifest();
+        ODFPackage mft = parseManifest();
         processManifestDocs( mft );
         getSubmission().cleanup();
         getCommentary().addComment(
@@ -95,17 +95,17 @@ public class ODFValidationSession extends ValidationSession
     }
 
 
-    private ODFPackageManifest parseManifest()
+    private ODFPackage parseManifest()
     {
         UUID uuid = this.getSubmission().getCandidateUuid();
         String manifestUrl = Store.urlForEntry( uuid, "META-INF/manifest.xml" ).toString();
-        ODFPackageManifest mft = new ODFPackageManifest();
+        ODFPackage mft = new ODFPackage();
         mft.process( manifestUrl );
         return mft;
     }
 
 
-    private void processManifestDocs( ODFPackageManifest mft )
+    private void processManifestDocs( ODFPackage mft )
     {
         for( int i = 0; i < mft.getItemRefs().size(); i++ )
         {

@@ -29,9 +29,9 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
 
-public class ODFPackageManifest implements ContentHandler
+public class ODFPackage extends Package, implements ContentHandler
 {
-    static Logger logger = Logger.getLogger( ODFPackageManifest.class );
+    static Logger logger = Logger.getLogger( ODFPackage.class );
 
     private final static String ODF_MANIFEST_NS = "urn:oasis:names:tc:opendocument:xmlns:manifest:1.0";
 

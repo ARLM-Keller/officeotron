@@ -53,19 +53,44 @@ public class Store
 
     public static UUID putZippedResource( InputStream is ) throws IOException
     {
+        
         UUID uuid = UUID.randomUUID();
         String fn = asFilename( uuid );
         new File( getDirectory( uuid ) ).mkdir();
+        File cwd = new File( getDirectory( uuid ) );
+        
         long written = Utils.streamToFile( is, fn, true );
+        
         logger.trace( "Wrote " + written + " bytes to file" );
+        
+        // get the zipinfo
+        String cmd = unzipInvocation + " -Z -v " + asFilename( uuid ) + " >"
+        + getDirectory( uuid ) + File.separator + uuid + "-zipinfo.txt";
+        
+        try
+        {           
+
+            Process p = Runtime.getRuntime().exec( cmd, null, cwd );
+            int ret = p.waitFor();
+            logger.debug( "Done cmd: " + cmd + ". return code=" + ret );
+            
+            cmd = unzipInvocation + " -Z " + asFilename( uuid ) + " >"
+            + getDirectory( uuid ) + File.separator + uuid + "-ziplist.txt";
+
+        }
+        catch( Exception e )
+        {
+            logger.fatal( e.getMessage() );
+        }
+        
 
         // unzip it
-        String cmd = unzipInvocation + " -qq " + asFilename( uuid ) + " -d"
+         cmd = unzipInvocation + " -qq " + asFilename( uuid ) + " -d"
                 + getDirectory( uuid );
         try
         {
 
-            File cwd = new File( getDirectory( uuid ) );
+            
 
             Process p = Runtime.getRuntime().exec( cmd, null, cwd );
             int ret = p.waitFor();

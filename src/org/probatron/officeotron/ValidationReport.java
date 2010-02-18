@@ -14,7 +14,6 @@
  * Software distributed under the License is distributed on an "AS IS" basis, WITHOUT WARRANTY
  * OF ANY KIND, either express or implied. See the License for the specific language governing
  * rights and limitations under the License.
- * 
  */
 
 package org.probatron.officeotron;
@@ -50,10 +49,12 @@ public class ValidationReport
         String ver = Package.getPackage( "org.probatron.officeotron" )
                 .getImplementationVersion();
 
-        sb.append( "<div class='meta'>Beginning validation using "
-                + "<a href='http://code.google.com/p/officeotron/'>Office-o-tron</a> <span class='officeotron-version'>" + ver
-                + "</span> at <span class='timestamp'>" + new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" ).format( new Date() )
-                + "</span></div>" );
+        sb
+                .append( "<div class='meta'>Beginning validation using "
+                        + "<a href='http://code.google.com/p/officeotron/'>Office-o-tron</a> <span class='officeotron-version'>"
+                        + ver + "</span> at <span class='timestamp'>"
+                        + new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" ).format( new Date() )
+                        + "</span></div>" );
     }
 
 
@@ -76,7 +77,7 @@ public class ValidationReport
     }
 
 
-    void streamOut( HttpServletResponse resp ) throws IOException
+    public void streamOut( HttpServletResponse resp ) throws IOException
     {
         sb.append( "</div>" );
 

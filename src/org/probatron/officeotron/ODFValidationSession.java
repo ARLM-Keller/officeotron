@@ -24,9 +24,9 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.UUID;
 
 import org.apache.log4j.Logger;
+import org.probatron.officeotron.sessionstorage.ValidationSession;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -75,11 +75,11 @@ public class ODFValidationSession extends ValidationSession
     }
 
 
-    public ODFValidationSession( Submission submission )
+    public ODFValidationSession( String filename, OptionMap optionMap )
     {
-        super( submission );
-        this.forceIs = getSubmission().getBooleanOption( "force-is" );
-        this.checkIds = getSubmission().getBooleanOption( "check-ids" );
+        super( filename );
+        this.forceIs = optionMap.getBooleanOption( "force-is" );
+        this.checkIds = optionMap.getBooleanOption( "check-ids" );
         logger.trace( "Creating ODFValidationSession. forceIs=" + this.forceIs + "; checkIds="
                 + this.checkIds );
     }
@@ -89,7 +89,6 @@ public class ODFValidationSession extends ValidationSession
     {
         ODFPackage mft = parseManifest();
         processManifestDocs( mft );
-        getSubmission().cleanup();
         getCommentary().addComment(
                 "Grand total count of validity errors: " + getCommentary().getErrCount() );
     }
@@ -97,9 +96,8 @@ public class ODFValidationSession extends ValidationSession
 
     private ODFPackage parseManifest()
     {
-        UUID uuid = this.getSubmission().getCandidateUuid();
-        String manifestUrl = Store.urlForEntry( uuid, "META-INF/manifest.xml" ).toString();
-        ODFPackage mft = new ODFPackage();
+        String manifestUrl = getUrlForEntry( "META-INF/manifest.xml" ).toString();
+        ODFPackage mft = new ODFPackage( this );
         mft.process( manifestUrl );
         return mft;
     }
@@ -110,9 +108,8 @@ public class ODFValidationSession extends ValidationSession
         for( int i = 0; i < mft.getItemRefs().size(); i++ )
         {
             String entry = mft.getItemRefs().get( i );
-            UUID uuid = this.getSubmission().getCandidateUuid();
 
-            String entryUrl = Store.urlForEntry( uuid, entry ).toString();
+            String entryUrl = getUrlForEntry( entry ).toString();
 
             logger.debug( "processing " + entryUrl );
             getCommentary().addComment( "Processing manifest entry: " + entry );

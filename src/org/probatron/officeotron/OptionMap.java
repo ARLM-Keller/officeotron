@@ -3,7 +3,7 @@
  * 
  * Office-o-tron - a web-based office document validator for Java(tm)
  * 
- * Copyright (c) 2009 Griffin Brown Digital Publishing Ltd.
+ * Copyright (c) 2009-2010 Griffin Brown Digital Publishing Ltd.
  * 
  * All rights reserved world-wide.
  * 
@@ -14,27 +14,26 @@
  * Software distributed under the License is distributed on an "AS IS" basis, WITHOUT WARRANTY
  * OF ANY KIND, either express or implied. See the License for the specific language governing
  * rights and limitations under the License.
- * 
  */
 
 package org.probatron.officeotron;
 
-public class DummySubmission extends Submission
+import java.util.HashMap;
+
+@SuppressWarnings("serial")
+public class OptionMap extends HashMap< String, String >
 {
-    String packageUrl;
-    
-    public DummySubmission( String packageUrl )
+
+    public String getOption( String name )
     {
-        super( null );
-        this.packageUrl = packageUrl;        
+        return get( name );
     }
 
-//    @Override
-//    public String getCandidateUrl()
-//    {
-//        return packageUrl;
-//    }
-    
-    
+
+    public boolean getBooleanOption( String name )
+    {
+        String s = get( name );
+        return ( s == null ) ? false : s.equalsIgnoreCase( "true" );
+    }
 
 }

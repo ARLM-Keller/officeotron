@@ -17,24 +17,28 @@
  */
 
 package org.probatron.officeotron;
-import org.apache.log4j.Logger;
 
-/**
- * Represents the inputs to a validation session. This includes a resource to be validated
- * (which may need to be de-referenced) and options to affect the validation process.
- */
-abstract public class Submission
+import org.probatron.officeotron.sessionstorage.ValidationSession;
+import org.probatron.officeotron.zip.ZipArchive;
+
+public class AbstractPackage
 {
-    static Logger logger = Logger.getLogger( Submission.class );
-
-    protected OptionMap optionMap = new OptionMap();
-
-
-    abstract public String getCandidateFile();
+    ValidationSession vs;
     
-    public OptionMap getOptionMap()
+
+
+    public AbstractPackage( ValidationSession vs )
     {
-        return this.optionMap;
+        this.vs = vs;
+
+
     }
+
+
+    public ValidationSession getSession()
+    {
+        return this.vs;
+    }
+
 
 }

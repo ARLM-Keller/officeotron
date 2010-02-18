@@ -21,28 +21,26 @@ package org.probatron.officeotron;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.UUID;
 
 import org.apache.log4j.Logger;
+import org.probatron.officeotron.sessionstorage.ValidationSession;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
 
-public class OPCPackage extends Package
+public class OPCPackage extends AbstractPackage
 {
     static Logger logger = Logger.getLogger( OPCPackage.class );
     private OOXMLTargetCollection col = new OOXMLTargetCollection();
     private ArrayList< String > foldersProbed = new ArrayList< String >();
-    private UUID uuid;
 
 
     // public String systemId;
 
-    public OPCPackage( UUID uuid )
+    public OPCPackage( ValidationSession vs )
     {
-        assert uuid != null : "null UUID";
-        this.uuid = uuid;
-        logger.trace( "Creating OPC package for submission: " + uuid );
+        super( vs );
+        logger.trace( "Creating OPC package for submission: " + getSession().getUuid() );
     }
 
 
@@ -57,7 +55,7 @@ public class OPCPackage extends Package
             OOXMLContentTypeHandler h = new OOXMLContentTypeHandler( this.col );
             parser.setContentHandler( h );
 
-            String ctu = Store.urlForEntry( uuid, "[Content_Types].xml" ).toString();
+            String ctu = getSession().getUrlForEntry( "[Content_Types].xml" ).toString();
             parser.parse( ctu );
         }
         catch( SAXException e )
@@ -83,8 +81,9 @@ public class OPCPackage extends Package
     private void procRels( String entry )
     {
 
-        String partUrl = Store.urlForEntry( uuid, entry ).toString();
-        logger.debug( "Retrieving relationship part from OPC package:" + partUrl + " (uuid = " + uuid + ")" );
+        String partUrl = getSession().getUrlForEntry( entry ).toString();
+        logger.debug( "Retrieving relationship part from OPC package:" + partUrl + " (uuid = "
+                + getSession().getUuid() + ")" );
 
         try
         {

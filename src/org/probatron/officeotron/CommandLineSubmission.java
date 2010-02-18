@@ -3,7 +3,7 @@
  * 
  * Office-o-tron - a web-based office document validator for Java(tm)
  * 
- * Copyright (c) 2009 Griffin Brown Digital Publishing Ltd.
+ * Copyright (c) 2010 Griffin Brown Digital Publishing Ltd.
  * 
  * All rights reserved world-wide.
  * 
@@ -14,43 +14,26 @@
  * Software distributed under the License is distributed on an "AS IS" basis, WITHOUT WARRANTY
  * OF ANY KIND, either express or implied. See the License for the specific language governing
  * rights and limitations under the License.
- * 
  */
+
 package org.probatron.officeotron;
 
-public abstract class ValidationSession
+public class CommandLineSubmission extends Submission
 {
-    private Submission submission;
-    private ValidationReport commentary = new ValidationReport();
-    protected int errCount;
+    private String filename;
 
 
-    public ValidationSession( Submission submission )
+    public CommandLineSubmission( String filename )
     {
-        this.submission = submission;
-
+        this.filename = filename;
     }
 
 
-    public Submission getSubmission()
+    @Override
+    public String getCandidateFile()
     {
-        return submission;
+        // TODO Auto-generated method stub
+        return filename;
     }
-
-
-    public ValidationReport getCommentary()
-    {
-        return commentary;
-    }
-
-    
-
-    public int getErrCount()
-    {
-        return errCount;
-    }
-
-
-    public abstract void validate();
 
 }

@@ -19,9 +19,9 @@
 package org.probatron.officeotron;
 
 import java.io.IOException;
-import java.util.UUID;
 
 import org.apache.log4j.Logger;
+import org.probatron.officeotron.sessionstorage.ValidationSession;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotRecognizedException;
@@ -35,16 +35,16 @@ public class OOXMLValidationSession extends ValidationSession
     private String schemaUrlBase;
 
 
-    public OOXMLValidationSession( Submission submission, String schemaUrlBase )
+    public OOXMLValidationSession( String filename, String schemaUrlBase )
     {
-        super( submission );
+        super( filename );
         this.schemaUrlBase = schemaUrlBase;
     }
 
 
     public void validate()
     {
-        OPCPackage opc = new OPCPackage( this.getSubmission().getCandidateUuid() );
+        OPCPackage opc = new OPCPackage( this );
         opc.process();
         checkRelationships( opc );
 
@@ -123,7 +123,8 @@ public class OOXMLValidationSession extends ValidationSession
             if( osm == null )
             {
                 this.getCommentary().addComment(
-                        "Cannot determine schema for this Target (\"<![CDATA[" + t.getQPartname() + "]]>\")" );
+                        "Cannot determine schema for this Target (\"<![CDATA["
+                                + t.getQPartname() + "]]>\")" );
 
             }
             else
@@ -160,10 +161,7 @@ public class OOXMLValidationSession extends ValidationSession
                             .getCommentary() );
                     XMLReader parser = getConfiguredParser( osm, h );
 
-        
-                    UUID uuid = this.getSubmission().getCandidateUuid();
-
-                    String url = Store.urlForEntry( uuid, t.getQPartname() ).toString();
+                    String url = getUrlForEntry( t.getQPartname() ).toString();
                     logger
                             .debug( "Validating: " + url + " using schema "
                                     + osm.getSchemaName() );

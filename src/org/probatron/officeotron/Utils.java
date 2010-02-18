@@ -30,9 +30,9 @@ import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.UUID;
 
 import org.apache.log4j.Logger;
+import org.probatron.officeotron.sessionstorage.ValidationSession;
 import org.xml.sax.Attributes;
 
 public class Utils
@@ -193,37 +193,37 @@ public class Utils
             String schemaUrlBase )
     {
         ValidationSession vs = null;
-        UUID uuid = sub.getCandidateUuid();
+
+        String fn = new File( sub.getCandidateFile() ).toURI().toASCIIString();
+        logger.debug( "auto-detecting package at: " + fn );
 
         try
         {
-           
-            String url = Store.urlForEntry( uuid, "META-INF/manifest.xml" ).toString();
+
+            String url = "jar:" + fn + "!/META-INF/manifest.xml";
             byte[] ba = Utils.derefUrl( new URL( url ) );
             if( ba != null )
             {
                 logger.info( "Auto detected ODF package" );
-                vs = new ODFValidationSession( sub );
+                vs = new ODFValidationSession( sub.getCandidateFile(), sub.getOptionMap() );
             }
             else
             {
-                url = Store.urlForEntry( uuid, "_rels/.rels" ).toString();
+                url = "jar:" + fn + "!/_rels/.rels";
                 ba = Utils.derefUrl( new URL( url ) );
                 if( ba != null )
                 {
                     logger.info( "Auto detected OOXML package" );
 
                     // we need to know where the OOXML schemas are
-                    // this is set in web.xml
 
-                    vs = new OOXMLValidationSession( sub, schemaUrlBase ); // FIXME
+                    vs = new OOXMLValidationSession( sub.getCandidateFile(), schemaUrlBase ); // FIXME
                 }
             }
         }
         catch( MalformedURLException e )
         {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.info(  e.getMessage() );
         }
 
         return vs;
@@ -290,6 +290,94 @@ public class Utils
         {
             // do nothing
         }
+    }
+
+
+    public static int readIntLittle( InputStream is ) throws IOException
+    {
+        byte b[] = new byte[ 4 ];
+        is.read( b );
+
+        int n = ( 0x000000FF & ( ( int )b[ 3 ] ) );
+        n <<= 8;
+        n |= ( 0x000000FF & ( ( int )b[ 2 ] ) );
+        n <<= 8;
+        n |= ( 0x000000FF & ( ( int )b[ 1 ] ) );
+        n <<= 8;
+        n |= ( 0x000000FF & ( ( int )b[ 0 ] ) );
+
+        return n;
+    }
+
+
+    public static short readShortLittle( InputStream is ) throws IOException
+    {
+        byte b[] = new byte[ 2 ];
+        is.read( b );
+
+        int n = ( 0x000000FF & ( ( int )b[ 1 ] ) );
+        n <<= 8;
+        n |= ( 0x000000FF & ( ( int )b[ 0 ] ) );
+
+        return ( short )n;
+    }
+
+
+    public static boolean deleteDir( File dir )
+    {
+        if( dir.isDirectory() )
+        {
+            String[] children = dir.list();
+            for( int i = 0; i < children.length; i++ )
+            {
+                boolean success = deleteDir( new File( dir, children[ i ] ) );
+                if( !success )
+                {
+                    return false;
+                }
+            }
+        }
+
+        // The directory is now empty so delete it
+        return dir.delete();
+    }
+
+
+    public static String makeElement( String name, Object o )
+    {
+        StringBuffer sb = new StringBuffer();
+
+        sb.append( "<" );
+        sb.append( name );
+        sb.append( ">" );
+        sb.append( o.toString() );
+        sb.append( "</" );
+        sb.append( name );
+        sb.append( ">" );
+
+        return sb.toString();
+    }
+
+
+    public static String makeByteElement( String name, byte[] b )
+    {
+        StringBuffer sb = new StringBuffer();
+
+        sb.append( "<" );
+        sb.append( name );
+        sb.append( ">" );
+        for( int i = 0; i < b.length; i++ )
+        {
+            sb.append( "<byte>" );
+            sb.append( Integer.toHexString( ( 0x000000FF & ( ( int )b[ i ] ) ) ).toUpperCase() );
+            sb.append( "</byte>" );
+        }
+
+        sb.append( "</" );
+        sb.append( name );
+        sb.append( ">" );
+
+        return sb.toString();
     }
 
 }

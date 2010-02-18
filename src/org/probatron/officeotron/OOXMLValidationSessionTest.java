@@ -45,7 +45,7 @@ public class OOXMLValidationSessionTest extends TestCase
         PropertyConfigurator.configure( p );
     }
 
-
+// FIXME
     @Override
     protected void setUp() throws Exception
     {

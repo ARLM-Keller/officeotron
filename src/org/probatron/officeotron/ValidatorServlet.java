@@ -14,7 +14,6 @@
  * Software distributed under the License is distributed on an "AS IS" basis, WITHOUT WARRANTY
  * OF ANY KIND, either express or implied. See the License for the specific language governing
  * rights and limitations under the License.
- * 
  */
 
 package org.probatron.officeotron;
@@ -30,8 +29,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+import org.probatron.officeotron.sessionstorage.Store;
+import org.probatron.officeotron.sessionstorage.ValidationSession;
 
-// TODO: add a friendly info page for when noobs try to GET this
+// TODO: add a friendly info page for when n00bs try to GET this
 @SuppressWarnings("serial")
 public class ValidatorServlet extends HttpServlet
 {
@@ -59,7 +60,11 @@ public class ValidatorServlet extends HttpServlet
             throws ServletException, IOException
     {
 
-        Store.init( this ); // to get the storage layer up and running
+        ServletContext sc = getServletContext();
+
+        Store.init( sc.getInitParameter( "temp-folder" ), sc
+                .getInitParameter( "unzip-invocation" ) ); // to get the storage layer up and
+        // running
 
         if( !contentLengthOkay( req ) )
         {
@@ -67,20 +72,21 @@ public class ValidatorServlet extends HttpServlet
             return;
         }
 
-        Submission sub = new Submission( req );
+        WebSubmission sub = new WebSubmission( req );
         int retCode = sub.fetchFromClient();
         if( retCode != 200 )
         {
             resp.sendError( retCode, sub.getResponseErr() );
             return;
         }
-        
-        ServletContext sc = getServletContext();
-        String schemaUrlBase = sc.getInitParameter( "ooxml-schema-base" );
-        logger.info(  "Using OOXML schemas at: " + schemaUrlBase );
 
-        ValidationSession vs = Utils.autoCreateValidationSession( sub, schemaUrlBase ); // determine ODF or
-                                                                         // OOXML
+        String schemaUrlBase = sc.getInitParameter( "ooxml-schema-base" );
+        logger.info( "Using OOXML schemas at: " + schemaUrlBase );
+
+        ValidationSession vs = Utils.autoCreateValidationSession( sub, schemaUrlBase ); // determine
+        // ODF
+        // or
+        // OOXML
         if( vs == null )
         {
             resp.sendError( 412,
@@ -88,7 +94,9 @@ public class ValidatorServlet extends HttpServlet
             return;
         }
 
+        vs.prepare();
         vs.validate();
+        vs.cleanup();
 
         vs.getCommentary().streamOut( resp );
     }

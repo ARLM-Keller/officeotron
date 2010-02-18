@@ -14,22 +14,27 @@
  * Software distributed under the License is distributed on an "AS IS" basis, WITHOUT WARRANTY
  * OF ANY KIND, either express or implied. See the License for the specific language governing
  * rights and limitations under the License.
- * 
  */
 
 package org.probatron.officeotron;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.util.Properties;
 
 import junit.framework.TestCase;
 
 import org.apache.log4j.PropertyConfigurator;
 import org.junit.Test;
+import org.probatron.officeotron.sessionstorage.Store;
+import org.probatron.officeotron.sessionstorage.ValidationSession;
 
 public class OPCPackageTest extends TestCase
 {
-    OPCPackage opc;
-    OPCPackage opc2;
+
+
+    ValidationSession vs1, vs2;
+    OPCPackage opc, opc2;
 
     static
     {
@@ -51,13 +56,33 @@ public class OPCPackageTest extends TestCase
     @Override
     protected void setUp() throws Exception
     {
-        // TODO: new test code
-//        opc = new OPCPackage( "file:etc/test-data/maria.xlsx" );
-//        opc2 = new OPCPackage( "file:etc/test-data/maria.xlsx" );
-//        opc.process();
-//        opc2 = new OPCPackage( "file:etc/test-data/torture.pptx" );
-//        opc2.process();
-//        super.setUp();
+        // special set-up for testing
+        Store.init( "c:\\officeotron", "cmd /c unzip" );
+
+
+        File f = new File( "etc/test-data/maria.xlsx" );
+        FileInputStream fis = new FileInputStream( f );
+        vs1 = new OOXMLValidationSession( null, null );
+        opc = new OPCPackage( vs1 );
+        opc.process();
+
+        f = new File( "etc/test-data/torture.pptx" );
+        fis = new FileInputStream( f );
+        vs2 = new OOXMLValidationSession( null, null );
+        opc2 = new OPCPackage( vs2 );
+        opc2.process();
+
+        super.setUp();
+
+    }
+
+
+    @Override
+    protected void tearDown() throws Exception
+    {
+    //    Store.delete( vs1.getUuid() );
+    //    Store.delete( vs2.getUuid() );
+        super.tearDown();
     }
 
 
@@ -65,15 +90,17 @@ public class OPCPackageTest extends TestCase
     public void test_targetCount()
     {
         assertTrue( opc.getEntryCollection().size() == 10 );
-        assertTrue( opc2.getEntryCollection().size() == 10);
+        assertTrue( opc2.getEntryCollection().size() == 10 );
     }
 
 
     @Test
     public void test_entrySizeMatch()
     {
-        assertTrue( opc.getEntryCollection().size() == opc.getEntryCollection().getPartNamesSet().size() );
-        assertTrue( opc2.getEntryCollection().size() == opc2.getEntryCollection().getPartNamesSet().size() );
+        assertTrue( opc.getEntryCollection().size() == opc.getEntryCollection()
+                .getPartNamesSet().size() );
+        assertTrue( opc2.getEntryCollection().size() == opc2.getEntryCollection()
+                .getPartNamesSet().size() );
     }
 
 
@@ -84,6 +111,10 @@ public class OPCPackageTest extends TestCase
         assertTrue( t != null );
         t = opc2.getEntryCollection().getTargetByName( "/ppt/slides/slide1.xml" );
         assertTrue( t != null );
+        
+        
+        t = opc2.getEntryCollection().getTargetByName( "/ppt/slides/slide999.xml" );
+        assertFalse( t != null );
     }
 
 
@@ -96,25 +127,20 @@ public class OPCPackageTest extends TestCase
                 .equals(
                         "http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" ) );
         t = opc2.getEntryCollection().getTargetByName( "/ppt/slides/slide1.xml" );
-        assertTrue( t
-                .getType()
-                .equals(
-                        "http://schemas.openxmlformats.org/officeDocument/2006/relationships/slide" ) );
+        assertTrue( t.getType().equals(
+                "http://schemas.openxmlformats.org/officeDocument/2006/relationships/slide" ) );
     }
-    
+
+
     @Test
     public void test_mimeType()
     {
         OOXMLTarget t = opc.getEntryCollection().getTargetByName( "/xl/worksheets/sheet1.xml" );
-        assertTrue( t
-                .getMimeType()
-                .equals(
-                        "application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml" ) );
+        assertTrue( t.getMimeType().equals(
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml" ) );
         t = opc2.getEntryCollection().getTargetByName( "/ppt/slides/slide1.xml" );
-        assertTrue( t
-                .getMimeType()
-                .equals(
-                        "application/vnd.openxmlformats-officedocument.presentationml.slide+xml" ) );
+        assertTrue( t.getMimeType().equals(
+                "application/vnd.openxmlformats-officedocument.presentationml.slide+xml" ) );
     }
 
 }

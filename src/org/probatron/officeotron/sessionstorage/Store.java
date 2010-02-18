@@ -16,7 +16,7 @@
  * rights and limitations under the License.
  */
 
-package org.probatron.officeotron;
+package org.probatron.officeotron.sessionstorage;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -27,10 +27,8 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.UUID;
 
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServlet;
-
 import org.apache.log4j.Logger;
+import org.probatron.officeotron.Utils;
 
 public class Store
 {
@@ -40,57 +38,50 @@ public class Store
     static String unzipInvocation;
 
 
-    public static void init( HttpServlet serv )
+ 
+    public static void init( String tmpFolder, String unzipInvocation )
     {
-        if( tmpFolder == null ) // true for one; true for both
-        {
-            ServletContext sc = serv.getServletContext();
-            tmpFolder = sc.getInitParameter( "temp-folder" );
-            unzipInvocation = sc.getInitParameter( "unzip-invocation" );
-        }
+        Store.tmpFolder = tmpFolder;
+        Store.unzipInvocation = unzipInvocation;
     }
 
 
     public static UUID putZippedResource( InputStream is ) throws IOException
     {
-        
+
         UUID uuid = UUID.randomUUID();
         String fn = asFilename( uuid );
         new File( getDirectory( uuid ) ).mkdir();
         File cwd = new File( getDirectory( uuid ) );
-        
+
         long written = Utils.streamToFile( is, fn, true );
-        
+
         logger.trace( "Wrote " + written + " bytes to file" );
-        
+
         // get the zipinfo
         String cmd = unzipInvocation + " -Z -v " + asFilename( uuid ) + " >"
-        + getDirectory( uuid ) + File.separator + uuid + "-zipinfo.txt";
-        
+                + getDirectory( uuid ) + File.separator + uuid + "-zipinfo.txt";
+
         try
-        {           
+        {
 
             Process p = Runtime.getRuntime().exec( cmd, null, cwd );
             int ret = p.waitFor();
             logger.debug( "Done cmd: " + cmd + ". return code=" + ret );
-            
-            cmd = unzipInvocation + " -Z " + asFilename( uuid ) + " >"
-            + getDirectory( uuid ) + File.separator + uuid + "-ziplist.txt";
+
+            cmd = unzipInvocation + " -Z " + asFilename( uuid ) + " >" + getDirectory( uuid )
+                    + File.separator + uuid + "-ziplist.txt";
 
         }
         catch( Exception e )
         {
             logger.fatal( e.getMessage() );
         }
-        
 
         // unzip it
-         cmd = unzipInvocation + " -qq " + asFilename( uuid ) + " -d"
-                + getDirectory( uuid );
+        cmd = unzipInvocation + " -qq " + asFilename( uuid ) + " -d" + getDirectory( uuid );
         try
         {
-
-            
 
             Process p = Runtime.getRuntime().exec( cmd, null, cwd );
             int ret = p.waitFor();
@@ -106,7 +97,7 @@ public class Store
     }
 
 
-    public static InputStream getStream( UUID uuid )
+    static InputStream getStream( UUID uuid )
     {
         String fn = asFilename( uuid );
         File f = new File( fn );
@@ -125,7 +116,7 @@ public class Store
     }
 
 
-    public static byte[] getBytes( UUID uuid )
+    static byte[] getBytes( UUID uuid )
     {
         byte[] ba = null;
 
@@ -145,7 +136,7 @@ public class Store
     }
 
 
-    public static URI urlForEntry( UUID uuid, String name )
+    static URI urlForEntry( UUID uuid, String name )
     {
         String fn = getDirectory( uuid ) + File.separator + name;
         URI uri = new File( fn ).toURI();
@@ -153,27 +144,26 @@ public class Store
     }
 
 
-    public static void delete( UUID uuid )
+    static void delete( UUID uuid )
     {
-        String fn = asFilename( uuid );
-        File f = new File( fn );
-        f.delete();
+        File dir = new File( getDirectory( uuid ) );
+        Utils.deleteDir( dir );
     }
 
 
-    public static String asUrlRef( UUID uuid )
+    static String asUrlRef( UUID uuid )
     {
         return "file:" + asFilename( uuid );
     }
 
 
-    private static String getDirectory( UUID uuid )
+    static String getDirectory( UUID uuid )
     {
         return tmpFolder + File.separator + uuid;
     }
 
 
-    private static String asFilename( UUID uuid )
+    public static String asFilename( UUID uuid )
     {
         return getDirectory( uuid ) + File.separator + uuid;
     }

@@ -1,6 +1,7 @@
 package org.probatron.officeotron;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
@@ -40,14 +41,21 @@ public class Driver
         ValidationSession vs = Utils.autoCreateValidationSession( cls, "file:C:\\tomcat-5.5\\webapps\\29500T\\" );
         vs.prepare();
         vs.validate();
-        
        
         
-       // vs.cleanup();
+      //  vs.cleanup();
         
-       // vs.getCommentary().streamOut( System.out. );
+        try
+        {
+            vs.getCommentary().streamOut( System.out  );
+        }
+        catch( IOException e )
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         
-        System.out.print( "Done." );
+        
         
         
     }

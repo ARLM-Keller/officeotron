@@ -36,6 +36,8 @@ public class ZipArchive
     private ArrayList< ZipLocalHeader > localHeaders = new ArrayList< ZipLocalHeader >();
     private ArrayList< ZipCentralRecord > centralRecords = new ArrayList< ZipCentralRecord >();
 
+    boolean usesDataDescriptors;
+
     ValidationSession session;
 
 
@@ -49,6 +51,7 @@ public class ZipArchive
     private void process()
     {
         InputStream is = this.session.getPackageStream();
+        boolean triedCdScan = false;
 
         try
         {
@@ -62,6 +65,13 @@ public class ZipArchive
                     ZipLocalHeader zlh = new ZipLocalHeader( is );
                     localHeaders.add( zlh );
                     logger.debug( "Read header for entry: " + zlh.getFilename() );
+
+                    if( !usesDataDescriptors
+                            && ( zlh.general & ZipLocalHeader.DATA_DESCRIPTOR_MASK ) != 0 )
+                    {
+                        usesDataDescriptors = true;
+                        logger.info( "Archive uses data descriptors" );
+                    }
 
                     // skip over data
                     is.skip( zlh.getCompressedSize() );
@@ -77,9 +87,27 @@ public class ZipArchive
                 }
                 else
                 {
-                    logger.debug( "unrecognized 4-byte sequence " + Integer.toHexString( sig )
-                            + "; skipping" );
-                    break;
+                    logger.debug( "unrecognized 4-byte sequence detected: "
+                            + Integer.toHexString( sig ) );
+
+                    if( triedCdScan )
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        triedCdScan = true;
+                        if( scanForCd( is ) )
+                        {
+                            ZipCentralRecord zcr = new ZipCentralRecord( is );
+                            centralRecords.add( zcr );
+                            logger
+                                    .debug( "Read central record for entry: "
+                                            + zcr.getFilename() );
+                            // will continue round loop
+                        }
+                    }
+
                 }
             }
         }
@@ -90,6 +118,52 @@ public class ZipArchive
         }
 
         Utils.streamClose( is );
+
+    }
+
+
+    public boolean scanForCd( InputStream is )
+    {
+        logger.debug( "Beginning scan for central directory" );
+        // public final static int ZIP_CENTRAL_SIGNATURE = 0x02014b50;
+        byte[] sig = new byte[] { ( byte )0x50, ( byte )0x4B, ( byte )0x01, ( byte )0x02 };
+
+        byte[] b = new byte[] { 0 };
+        int n = 0;
+
+        try
+        {
+            while( is.available() > 0 )
+            {
+                int r = is.read( b );
+                if( b[ 0 ] == sig[ n ] )
+                {
+                    n++;
+                }
+                else
+                {
+                    n = 0;
+                }
+
+                if( n == 4 )
+                {
+                    return true;
+                }
+
+                if( r == 0 )
+                {
+                    return false;
+                }
+
+            }
+        }
+        catch( IOException e )
+        {
+            // EOF happened
+        }
+        logger.info( "Central directory NOT found" );
+
+        return false;
 
     }
 
@@ -127,7 +201,6 @@ public class ZipArchive
         for( int i = 0; i < this.localHeaders.size(); i++ )
         {
             sb.append( getLocalHeader( i ).asXmlString() );
-
         }
 
         sb.append( "</local-headers><central-directory>" );
@@ -140,7 +213,12 @@ public class ZipArchive
         sb.append( "</central-directory></zip-archive>" );
 
         return sb.toString();
+    }
 
+
+    public boolean usesDataDescriptors()
+    {
+        return usesDataDescriptors;
     }
 
 }

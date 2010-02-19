@@ -19,7 +19,6 @@
 package org.probatron.officeotron.zip;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.util.Properties;
 
 import junit.framework.TestCase;
@@ -31,7 +30,6 @@ import org.probatron.officeotron.Utils;
 import org.probatron.officeotron.sessionstorage.Store;
 import org.probatron.officeotron.sessionstorage.ValidationSession;
 import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
 
@@ -75,7 +73,7 @@ public class ZipArchiveTest extends TestCase
     @Override
     protected void tearDown() throws Exception
     {
-       // vs.cleanup();
+        // vs.cleanup();
         super.tearDown();
     }
 
@@ -112,8 +110,7 @@ public class ZipArchiveTest extends TestCase
 
         assertTrue( h.getExtractVersion()[ 0 ] == ( byte )0x14 );
         assertTrue( h.getExtractVersion()[ 1 ] == ( byte )0x00 );
-        assertTrue( h.getGeneral()[ 0 ] == ( byte )0x06 );
-        assertTrue( h.getGeneral()[ 1 ] == ( byte )0x00 );
+        assertTrue( h.getGeneral() == 6 );
         assertTrue( h.getMethod()[ 0 ] == ( byte )0x08 );
         assertTrue( h.getMethod()[ 1 ] == ( byte )0x00 );
         assertTrue( h.getModTime()[ 0 ] == ( byte )0x00 );

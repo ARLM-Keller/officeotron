@@ -79,7 +79,7 @@ public class ValidationSession
     }
 
 
-    public void prepare()
+    final public void prepare()
     {
         logger.debug( "Preparing session" );
         try
@@ -93,7 +93,23 @@ public class ValidationSession
             logger.fatal( e.getMessage() );
         }
 
+        getCommentary().addComment( "Inspecting ZIP ..." );
+        getCommentary().incIndent();
+
         this.zipArchive = new ZipArchive( this );
+        if( zipArchive.getLocalHeaderCount() != zipArchive.getCentralRecordCount() )
+        {
+            getCommentary().addComment( "WARN",
+                    "Mismatch between local header and central record" );
+        }
+        else
+        {
+            getCommentary().addComment(
+                    "" + zipArchive.getCentralRecordCount() + " central records found" );
+
+        }
+
+        onExtendedZipInspection();
 
         String fn = Store.getDirectory( uuid ) + File.separator + uuid + "-zip.xml";
         try
@@ -104,8 +120,15 @@ public class ValidationSession
         {
             logger.error( e.getMessage() );
         }
+        getCommentary().decIndent();
 
         donePrep = true;
+    }
+
+
+    public void onExtendedZipInspection()
+    {
+    // do nothing
     }
 
 
@@ -130,11 +153,7 @@ public class ValidationSession
 
     public void validate()
     {
-        if( !donePrep )
-        {
-            throw new IllegalStateException( "prepare() has not been called" );
-        }
-        prepare();
+       
     }
 
 }

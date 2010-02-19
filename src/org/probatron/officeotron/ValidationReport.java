@@ -20,6 +20,7 @@ package org.probatron.officeotron;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -58,13 +59,13 @@ public class ValidationReport
     }
 
 
-    void addComment( String s )
+    public void addComment( String s )
     {
         addComment( "INFO", s );
     }
 
 
-    void addComment( String klass, String s )
+    public void addComment( String klass, String s )
     {
 
         sb.append( "<div class='" + klass + "'>" );
@@ -98,9 +99,27 @@ public class ValidationReport
             logger.fatal( "Validation report is not conformant XML" );
         }
 
+        streamOut( ba, resp.getOutputStream() );
+
+    }
+
+
+    private void streamOut( byte[] ba, OutputStream os ) throws IOException
+    {
         ByteArrayInputStream bis = new ByteArrayInputStream( ba );
-        Utils.transferBytesToEndOfStream( bis, resp.getOutputStream(), Utils.CLOSE_IN
-                | Utils.CLOSE_OUT );
+
+        Utils.transferBytesToEndOfStream( bis, os, Utils.CLOSE_IN | Utils.CLOSE_OUT );
+
+    }
+
+
+    public void streamOut( OutputStream os ) throws IOException
+    {
+        sb.append( "</div>" );
+
+        byte[] ba = sb.toString().getBytes( "us-ascii" ); // utf-8 compatible natch
+        streamOut( ba, os );
+
     }
 
 

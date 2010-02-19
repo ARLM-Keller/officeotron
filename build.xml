@@ -54,17 +54,37 @@
 
 
 	<target name="jar" depends="compile" description="makes the JAR">
-		<!-- Create the distribution directory -->
+		<!-- Create the build directories -->
 		<mkdir dir="${build}/lib" />
+		<mkdir dir="${dist}/temp" />
+		
+		<!-- unpack the libs -->
+	    <unjar src="${lib}/log4j-1.2.15.jar" dest="${dist}/temp"/>
+	    <unjar src="${lib}/commons-fileupload-1.2.1.jar" dest="${dist}/temp"/>
+		<unjar src="${lib}/jing.jar" dest="${dist}/temp"/>
+		
+		<!-- copy *our* newly-compiled class files -->
+		<copy todir="${dist}/temp">
+		      <fileset dir="${build}/classes">
+		      	  <exclude name="**/*Test.class"/>
+		      	<exclude name="**/Driver.class"/>
+		      </fileset>
+		</copy>
+		<!-- <delete dir="${dist}/temp/META-INF"/> -->
+		
+		
 		<!-- Put everything in ${build} into the MyProject-${DSTAMP}.jar file -->
-		<jar jarfile="${build}/lib/officeotron-${version}.jar" basedir="${build}/classes">
+		<jar jarfile="${build}/lib/officeotron-${version}.jar" basedir="${dist}/temp">
 			<manifest>
 				<attribute name="Built-By" value="Griffin Brown Digital Publishing Ltd" />
 				<attribute name="Implementation-Vendor" value="Griffin Brown Digital Publishing Ltd" />
 				<attribute name="Implementation-Title" value="Office-o-tron" />
 				<attribute name="Implementation-Version" value="${version}" />
+				<attribute name="Main-Class" value="org.probatron.officeotron.Driver"/>
 			</manifest>
 		</jar>
+		
+		<delete dir="${dist}/temp"/>
 	</target>
 
 

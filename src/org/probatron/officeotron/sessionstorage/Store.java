@@ -18,6 +18,7 @@
 
 package org.probatron.officeotron.sessionstorage;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -56,30 +57,30 @@ public class Store
 
         long written = Utils.streamToFile( is, fn, true );
 
-        logger.trace( "Wrote " + written + " bytes to file" );
+        logger.debug( "Wrote " + written + " bytes to file" );
 
         // get the zipinfo
-        String cmd = unzipInvocation + " -Z -v " + asFilename( uuid ) + " >"
-                + getDirectory( uuid ) + File.separator + uuid + "-zipinfo.txt";
-
-        try
-        {
-
-            Process p = Runtime.getRuntime().exec( cmd, null, cwd );
-            int ret = p.waitFor();
-            logger.debug( "Done cmd: " + cmd + ". return code=" + ret );
-
-            cmd = unzipInvocation + " -Z " + asFilename( uuid ) + " >" + getDirectory( uuid )
-                    + File.separator + uuid + "-ziplist.txt";
-
-        }
-        catch( Exception e )
-        {
-            logger.fatal( e.getMessage() );
-        }
+//        String cmd = unzipInvocation + " -Z -v " + asFilename( uuid ) + " >"
+//                + getDirectory( uuid ) + File.separator + uuid + "-zipinfo.txt";
+//
+//        try
+//        {
+//
+//            Process p = Runtime.getRuntime().exec( cmd, null, cwd );
+//            int ret = p.waitFor();
+//            logger.debug( "Done cmd: " + cmd + ". return code=" + ret );
+//
+//            cmd = unzipInvocation + " -Z " + asFilename( uuid ) + " >" + getDirectory( uuid )
+//                    + File.separator + uuid + "-ziplist.txt";
+//
+//        }
+//        catch( Exception e )
+//        {
+//            logger.fatal( e.getMessage() );
+//        }
 
         // unzip it
-        cmd = unzipInvocation + " -qq " + asFilename( uuid ) + " -d" + getDirectory( uuid );
+        String cmd = unzipInvocation + " -qq " + asFilename( uuid ) + " -d" + getDirectory( uuid );
         try
         {
 
@@ -105,7 +106,7 @@ public class Store
 
         try
         {
-            is = new FileInputStream( f );
+            is = new  FileInputStream( f ) ;
         }
         catch( FileNotFoundException e )
         {

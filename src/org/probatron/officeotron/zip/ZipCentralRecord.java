@@ -46,7 +46,7 @@ public class ZipCentralRecord extends ZipHeaderBase
         {
             is.read( madeByVersion );
             is.read( this.extractVersion );
-            is.read( this.general );
+            this.general = Utils.readShortLittle( is  );
             is.read( this.method );
             is.read( this.modTime );
             is.read( this.modDate );
@@ -130,7 +130,7 @@ public class ZipCentralRecord extends ZipHeaderBase
         sb.append( Utils.makeElement( "filename", this.filename ) );
         sb.append( Utils.makeByteElement( "version-made-by", this.madeByVersion ) );
         sb.append( Utils.makeByteElement( "version-needed-to-extract", this.extractVersion ) );
-        sb.append( Utils.makeByteElement( "general-flag", this.general ) );
+        sb.append( Utils.makeElement( "general-flag", this.general ) );
         sb.append( Utils.makeByteElement( "compression-method", this.method ) );
         sb.append( Utils.makeByteElement( "mod-time", this.extractVersion ) );
         sb.append( Utils.makeByteElement( "mod-date", this.extractVersion ) );

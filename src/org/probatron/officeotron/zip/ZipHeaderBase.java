@@ -26,7 +26,7 @@ public class ZipHeaderBase
     static Logger logger = Logger.getLogger( ZipHeaderBase.class );
 
     protected byte[] extractVersion = new byte[ 2 ];
-    protected byte[] general = new byte[ 2 ];
+    protected short general;
     protected byte[] method = new byte[ 2 ];
     protected byte[] modTime = new byte[ 2 ];
     protected byte[] modDate = new byte[ 2 ];
@@ -49,7 +49,7 @@ public class ZipHeaderBase
     }
 
 
-    public byte[] getGeneral()
+    public short getGeneral()
     {
         return general;
     }

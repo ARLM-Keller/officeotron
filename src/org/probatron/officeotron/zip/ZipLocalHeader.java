@@ -31,6 +31,7 @@ public class ZipLocalHeader extends ZipHeaderBase
 {
 
     static Logger logger = Logger.getLogger( ZipLocalHeader.class );
+    static final short DATA_DESCRIPTOR_MASK = ( short )0x0008;
 
 
     public ZipLocalHeader( InputStream is )
@@ -39,7 +40,7 @@ public class ZipLocalHeader extends ZipHeaderBase
         {
 
             is.read( this.extractVersion );
-            is.read( this.general );
+            this.general = Utils.readShortLittle( is );
             is.read( this.method );
             is.read( this.modTime );
             is.read( this.modDate );
@@ -72,7 +73,7 @@ public class ZipLocalHeader extends ZipHeaderBase
 
         sb.append( Utils.makeElement( "filename", this.filename ) );
         sb.append( Utils.makeByteElement( "version-needed-to-extract", this.extractVersion ) );
-        sb.append( Utils.makeByteElement( "general-flag", this.general ) );
+        sb.append( Utils.makeElement( "general-flag", this.general ) );
         sb.append( Utils.makeByteElement( "compression-method", this.method ) );
         sb.append( Utils.makeByteElement( "mod-time", this.extractVersion ) );
         sb.append( Utils.makeByteElement( "mod-date", this.extractVersion ) );
@@ -81,7 +82,6 @@ public class ZipLocalHeader extends ZipHeaderBase
         sb.append( Utils.makeElement( "uncompressed-size", this.uncompressedSize ) );
         sb.append( Utils.makeElement( "filename-length", this.filenameLength ) );
         sb.append( Utils.makeElement( "extra-field-length", this.extraFieldLength ) );
-        
 
         sb.append( "</local-header>" );
 

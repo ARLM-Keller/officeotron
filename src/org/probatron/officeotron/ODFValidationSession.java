@@ -53,6 +53,7 @@ public class ODFValidationSession extends ValidationSession
 
     private boolean forceIs;
     private boolean checkIds;
+    private boolean uses12;
 
     static
     {
@@ -89,6 +90,13 @@ public class ODFValidationSession extends ValidationSession
     {
         ODFPackage mft = parseManifest();
         processManifestDocs( mft );
+        
+        if( uses12 && getZipArchive().usesDataDescriptors())
+        {
+            getCommentary().addComment( "ERROR", "ZIP is a non-conformant draft ODF 1.2 package (data descriptors detected)" );
+            
+        }
+        
         getCommentary().addComment(
                 "Grand total count of validity errors: " + getCommentary().getErrCount() );
     }
@@ -171,7 +179,7 @@ public class ODFValidationSession extends ValidationSession
             else
             {
                 getCommentary().addComment( "WARN",
-                        "It has no version attribute! (ODF v1.1 probably intended)" );
+                        "It has no version attribute! (assuming ODF v1.1)" );
                 ver = "1.1";
             }
         }
@@ -272,6 +280,7 @@ public class ODFValidationSession extends ValidationSession
         else if( ver.equals( "1.2" ) )
         {
             schemaBytes = schema12;
+            uses12 = true;
         }
         else
         {

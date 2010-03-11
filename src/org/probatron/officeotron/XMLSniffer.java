@@ -36,6 +36,7 @@ public class XMLSniffer implements ContentHandler
 
     private String contextNs;
     private String contextElement;
+    boolean referencesEntities;
 
     private XMLSniffData sniffData;
 
@@ -47,6 +48,7 @@ public class XMLSniffer implements ContentHandler
 
         parser = XMLReaderFactory.createXMLReader();
         parser.setContentHandler( this );
+        parser.setEntityResolver( new BlankingResolver( this) );
         parser.parse( url );
 
         return this.sniffData;

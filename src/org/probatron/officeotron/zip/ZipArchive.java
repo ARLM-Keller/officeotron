@@ -116,8 +116,10 @@ public class ZipArchive
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-
-        Utils.streamClose( is );
+        finally
+        {
+            Utils.streamClose( is );
+        }
 
     }
 

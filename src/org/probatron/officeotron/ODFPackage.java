@@ -48,13 +48,15 @@ public class ODFPackage extends AbstractPackage implements ContentHandler
         {
             XMLReader parser = XMLReaderFactory.createXMLReader();
             parser.setContentHandler( this );
+            parser.setEntityResolver( new BlankingResolver( null ) );
+         
             parser.parse( sysId );
         }
         catch( Exception e )
         {
             // this will have already been parsed once, so this should never happen
             e.printStackTrace();
-            throw new RuntimeException();
+            throw new RuntimeException( e.getMessage() );
         }
     }
 

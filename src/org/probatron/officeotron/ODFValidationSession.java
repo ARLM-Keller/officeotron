@@ -95,6 +95,7 @@ public class ODFValidationSession extends ValidationSession
         {
             getCommentary().addComment( "ERROR", "ZIP is a non-conformant draft ODF 1.2 package (data descriptors detected)" );
             
+            
         }
         
         getCommentary().addComment(

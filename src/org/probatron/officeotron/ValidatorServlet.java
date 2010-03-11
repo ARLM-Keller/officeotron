@@ -96,9 +96,12 @@ public class ValidatorServlet extends HttpServlet
 
         vs.prepare();
         vs.validate();
+        vs.getCommentary().endReport();
         vs.cleanup();
 
         vs.getCommentary().streamOut( resp );
+        
+        
     }
 
 

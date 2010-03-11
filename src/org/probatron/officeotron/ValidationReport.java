@@ -40,6 +40,7 @@ public class ValidationReport
 
     private int indent;
     private int errCount;
+    private boolean ended;
 
 
     public ValidationReport()
@@ -78,9 +79,25 @@ public class ValidationReport
     }
 
 
+    public void endReport()
+    {
+        if( this.ended )
+        {
+            throw new IllegalStateException( "endReport() already called" );
+        }
+        this.ended = true;
+        sb.append( "</div>" );
+
+    }
+
+
     public void streamOut( HttpServletResponse resp ) throws IOException
     {
-        sb.append( "</div>" );
+
+        if( !this.ended )
+        {
+            throw new IllegalStateException( "endReport() not called" );
+        }
 
         byte[] ba = sb.toString().getBytes( "us-ascii" ); // utf-8 compatible natch
 

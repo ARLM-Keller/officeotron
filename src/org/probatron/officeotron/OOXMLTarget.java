@@ -32,6 +32,7 @@ public class OOXMLTarget
     String type;
     String mimeType;
     String name;
+    boolean slashFail;
 
 
     public OOXMLTarget( String hostPartEntryName, AttributesImpl atts )
@@ -106,7 +107,8 @@ public class OOXMLTarget
         String s = base + getName();
         if( !s.startsWith( "/" ) )
         {
-            s = "/" + s; // OPC spec seems ambiguous on whether leading "/" is required
+            this.slashFail = true;
+            s = "/" + s; // OPC spec is contradictory on whether leading "/" is required
         }
         return s;
     }

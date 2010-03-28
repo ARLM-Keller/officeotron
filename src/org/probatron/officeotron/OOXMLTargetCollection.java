@@ -31,6 +31,7 @@ public class OOXMLTargetCollection extends ArrayList<OOXMLTarget>
     static Logger logger = Logger.getLogger( OOXMLTargetCollection.class );
 
     private HashMap<String, OOXMLTarget> partNameMap = new HashMap<String, OOXMLTarget>();
+    
 
 
     @Override
@@ -39,6 +40,7 @@ public class OOXMLTargetCollection extends ArrayList<OOXMLTarget>
         logger.debug( "Adding entry to target collection " + t.getQPartname() );
         partNameMap.put( t.getQPartname(), t );
         return super.add( t );
+       
     }
 
 

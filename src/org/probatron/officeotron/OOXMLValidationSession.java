@@ -90,6 +90,21 @@ public class OOXMLValidationSession extends ValidationSession
                                 + "\" (see ISO/IEC 29500-1:2008, Clause " + osm.getClause()
                                 + ")" );
             }
+            if( t.slashFail )
+            {
+                logger.debug( "Relative IRI problem in OPC" );
+                this.errCount++;
+                this
+                        .getCommentary()
+                        .addComment(
+                                "ERROR",
+                                "Entry with MIME type \""
+                                        + mt
+                                        + "\" has a non-conformant Part Name (\""
+                                        + t.name
+                                        + "\") as it does not start with a mandatory forward slash character (see ISO/IEC 29500-2:2008, Clause 9.1.1.1)" );
+
+            }
 
         }
 

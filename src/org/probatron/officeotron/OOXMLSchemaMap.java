@@ -183,9 +183,9 @@ public class OOXMLSchemaMap
 
         OOXMLSchemaMap.addMapping( new OOXMLSchemaMapping( "12.3.8",
                 "application/vnd.openxmlformats-officedocument.drawing+xml",
-                "http://schemas.openxmlformats.org/spreadsheetml/2006/main",
+                "http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing",
                 "http://schemas.openxmlformats.org/officeDocument/2006/relationships/drawing",
-                "sml.xsd" ) );
+                "dml-spreadsheetDrawing.xsd" ) );
 
         OOXMLSchemaMap
                 .addMapping( new OOXMLSchemaMapping(
@@ -429,7 +429,7 @@ public class OOXMLSchemaMap
                 "application/vnd.openxmlformats-officedocument.drawingml.chart+xml",
                 "http://schemas.openxmlformats.org/drawingml/2006/chart",
                 "http://schemas.openxmlformats.org/officeDocument/2006/relationships/chart",
-                "dml-main.xsd" ) );
+                "dml-chart.xsd" ) );
 
         OOXMLSchemaMap
                 .addMapping( new OOXMLSchemaMapping(
@@ -461,7 +461,7 @@ public class OOXMLSchemaMap
                         "application/vnd.openxmlformats-officedocument.drawingml.diagramLayout+xml",
                         "http://schemas.openxmlformats.org/drawingml/2006/diagram",
                         "http://schemas.openxmlformats.org/officeDocument/2006/relationships/diagramLayout",
-                        "dml-main.xsd" ) );
+                        "dml-diagram.xsd" ) );
 
         OOXMLSchemaMap
                 .addMapping( new OOXMLSchemaMapping(
@@ -469,7 +469,7 @@ public class OOXMLSchemaMap
                         "application/vnd.openxmlformats-officedocument.drawingml.diagramStyle+xml",
                         "http://schemas.openxmlformats.org/drawingml/2006/diagram",
                         "http://schemas.openxmlformats.org/officeDocument/2006/relationships/diagramQuickStyle",
-                        "dml-main.xsd" ) );
+                        "dml-diagram.xsd" ) );
 
         OOXMLSchemaMap.addMapping( new OOXMLSchemaMapping( "14.2.7",
                 "application/vnd.openxmlformats-officedocument.theme+xml",
@@ -500,6 +500,17 @@ public class OOXMLSchemaMap
                         "http://schemas.openxmlformats.org/officeDocument/2006/customXmlDataProps",
                         "http://schemas.openxmlformats.org/officeDocument/2006/relationships/customXmlProps",
                         "" ) );
+        
+        OOXMLSchemaMap
+        .addMapping( new OOXMLSchemaMapping(
+                "8.1 (Part 4)",
+                "application/vnd.openxmlformats-officedocument.vmlDrawing",
+                "",
+                "http://schemas.openxmlformats.org/officeDocument/2006/relationships/vmlDrawing",
+                "vml-main.xsd" ) );
+        
+        // http://schemas.openxmlformats.org/officeDocument/2006/relationships/vmlDrawing
+        // http://schemas.openxmlformats.org/officeDocument/2006/relationships/vmlDrawing
 
     }
 

@@ -33,7 +33,7 @@ public class OOXMLRelationshipPartHandler implements ContentHandler
     String hostRelationshipPartEntryName;
 
 
-    public OOXMLRelationshipPartHandler( String hostRelationshipPartEntryName )
+    public OOXMLRelationshipPartHandler(  String hostRelationshipPartEntryName )
     {
         this.hostRelationshipPartEntryName = hostRelationshipPartEntryName;
     }

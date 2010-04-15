@@ -14,14 +14,19 @@
  * Software distributed under the License is distributed on an "AS IS" basis, WITHOUT WARRANTY
  * OF ANY KIND, either express or implied. See the License for the specific language governing
  * rights and limitations under the License.
- * 
  */
 
 package org.probatron.officeotron;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import org.apache.log4j.Logger;
 import org.xml.sax.helpers.AttributesImpl;
 
+/**
+ * Targets of Relationships in OPC Packages.
+ */
 public class OOXMLTarget
 {
 
@@ -32,7 +37,6 @@ public class OOXMLTarget
     String type;
     String mimeType;
     String name;
-    boolean slashFail;
 
 
     public OOXMLTarget( String hostPartEntryName, AttributesImpl atts )
@@ -63,12 +67,22 @@ public class OOXMLTarget
     }
 
 
+    public String getExtension()
+    {
+        String[] split = this.name.split( "\\." );
+        return split[ split.length - 1 ];
+    }
+
+
     public void setMimeType( String mimeType )
     {
         this.mimeType = mimeType;
     }
 
 
+    /**
+     * @return the full name of the rels file in which this Relationship occurs
+     */
     public String getHostPartEntryName()
     {
         return hostPartEntryName;
@@ -87,10 +101,10 @@ public class OOXMLTarget
     }
 
 
-    public String getTargetFolder()
+    public String getHostFolder()
     {
-        String s = this.name.replaceFirst( "/[^/]+$", "" );
-        return s;
+        String base = this.hostPartEntryName.replaceFirst( "_rels/.*$", "" );
+        return base;
     }
 
 
@@ -101,16 +115,54 @@ public class OOXMLTarget
     }
 
 
-    public String getQPartname()
+    public String getTargetFolder()
     {
-        String base = this.hostPartEntryName.replaceFirst( "_rels/.*$", "" );
-        String s = base + getName();
-        if( !s.startsWith( "/" ) )
+        String pn = getTargetAsPartName();
+
+        return pn.replaceFirst( "[^/]+$", "" );
+    }
+
+
+    public String getTargetAsPartName()
+    {
+        String s = getName();
+
+        if( s.startsWith( "/" ) )
         {
-            this.slashFail = true;
-            s = "/" + s; // OPC spec is contradictory on whether leading "/" is required
+            return s;
         }
-        return s;
+
+        // else, we're into relative target reference territory
+
+        // the "source part" URL base is the parent of the folder in which the .rels file sits
+        String sbase = this.hostPartEntryName.replaceFirst( "_rels/.*$", "" );
+
+        String result = null;
+
+        // resolve the relative address
+        try
+        {
+            URI base = new URI( sbase );
+            URI resolved = base.resolve( new URI( this.getName() ) );
+
+            result = resolved.toString();
+
+            if( !result.startsWith( "/" ) )
+            {
+                result = "/" + result;
+            }
+
+            logger.debug( "Target " + this.getName() + " is resolved to Part Name " + result );
+
+        }
+        catch( URISyntaxException e )
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        return result;
+
     }
 
 

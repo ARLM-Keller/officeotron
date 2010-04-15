@@ -14,7 +14,6 @@
  * Software distributed under the License is distributed on an "AS IS" basis, WITHOUT WARRANTY
  * OF ANY KIND, either express or implied. See the License for the specific language governing
  * rights and limitations under the License.
- * 
  */
 
 package org.probatron.officeotron;
@@ -28,12 +27,42 @@ import org.xml.sax.SAXException;
 public class OOXMLContentTypeHandler implements ContentHandler
 {
     static Logger logger = Logger.getLogger( OOXMLContentTypeHandler.class );
-    OOXMLTargetCollection col;
+    private OOXMLTargetCollection col;
+    private OOXMLDefaultTypeMap dtm;
 
 
-    public OOXMLContentTypeHandler( OOXMLTargetCollection col )
+    public OOXMLContentTypeHandler( OOXMLTargetCollection col, OOXMLDefaultTypeMap dtm )
     {
         this.col = col;
+        this.dtm = dtm;
+    }
+
+
+    public void startElement( String uri, String localName, String qName, Attributes atts )
+            throws SAXException
+    {
+        if( uri.equals( "http://schemas.openxmlformats.org/package/2006/content-types" ) )
+        {
+            String name = atts.getValue( "PartName" );
+            if( localName.equals( "Override" ) )
+            {
+                OOXMLTarget t = this.col.getTargetByName( name );
+                if( t != null )
+                {
+                    String ct = atts.getValue( "ContentType" );
+                    logger.debug( "Setting MIME type for entry " + name + " as: " + ct );
+                    t.setMimeType( ct );
+                }
+            }
+            else if( localName.equals( "Default" ) )
+            {
+                String extension = atts.getValue( "Extension" );
+                String mt = atts.getValue( "ContentType" );
+                this.dtm.put( extension, mt );
+                logger.debug( "associating extension \"" + extension + "\" with MIME type "+ mt );
+            }
+        }
+
     }
 
 
@@ -88,31 +117,6 @@ public class OOXMLContentTypeHandler implements ContentHandler
     public void startDocument() throws SAXException
     {
     // do nothing
-    }
-
-
-    public void startElement( String uri, String localName, String qName, Attributes atts )
-            throws SAXException
-    {
-        if( uri.equals( "http://schemas.openxmlformats.org/package/2006/content-types" ) )
-        {
-            String name = atts.getValue( "PartName" );
-            if( localName.equals( "Override" ) )
-            {
-                OOXMLTarget t = this.col.getTargetByName( name );
-                if( t != null )
-                {
-                    String ct = atts.getValue( "ContentType" );
-                    logger.debug( "Setting MIME type for entry " + name + " as: " + ct );
-                    t.setMimeType( ct );
-                }
-            }
-            else if( localName.equals( "Default" ) )
-            {
-                //TODO: implement
-            }
-        }
-
     }
 
 

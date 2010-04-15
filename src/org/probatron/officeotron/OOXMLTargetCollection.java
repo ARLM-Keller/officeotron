@@ -37,8 +37,8 @@ public class OOXMLTargetCollection extends ArrayList<OOXMLTarget>
     @Override
     public boolean add( OOXMLTarget t )
     {
-        logger.debug( "Adding entry to target collection " + t.getQPartname() );
-        partNameMap.put( t.getQPartname(), t );
+        logger.debug( "Adding entry to target collection " + t.getTargetAsPartName() );
+        partNameMap.put( t.getTargetAsPartName(), t );
         return super.add( t );
        
     }

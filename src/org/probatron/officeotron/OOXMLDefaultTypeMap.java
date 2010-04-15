@@ -3,7 +3,7 @@
  * 
  * Office-o-tron - a web-based office document validator for Java(tm)
  * 
- * Copyright (c) 2009 Griffin Brown Digital Publishing Ltd.
+ * Copyright (c) 2010 Griffin Brown Digital Publishing Ltd.
  * 
  * All rights reserved world-wide.
  * 
@@ -14,15 +14,14 @@
  * Software distributed under the License is distributed on an "AS IS" basis, WITHOUT WARRANTY
  * OF ANY KIND, either express or implied. See the License for the specific language governing
  * rights and limitations under the License.
- * 
  */
 
 package org.probatron.officeotron;
 
-import org.apache.log4j.Logger;
+import java.util.HashMap;
 
-public class OOXMLRelationshipPart
+@SuppressWarnings("serial")
+public class OOXMLDefaultTypeMap extends HashMap< String, String >
 {
-    static Logger logger = Logger.getLogger( OOXMLRelationshipPart.class );
 
 }

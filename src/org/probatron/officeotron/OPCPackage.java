@@ -19,7 +19,6 @@
 package org.probatron.officeotron;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
@@ -32,7 +31,8 @@ public class OPCPackage extends AbstractPackage
 {
     static Logger logger = Logger.getLogger( OPCPackage.class );
     private OOXMLTargetCollection col = new OOXMLTargetCollection();
-    private ArrayList< String > foldersProbed = new ArrayList< String >();
+    // private ArrayList< String > foldersProbed = new ArrayList< String >();
+     OOXMLDefaultTypeMap dtm = new OOXMLDefaultTypeMap();
 
 
     // public String systemId;
@@ -46,13 +46,13 @@ public class OPCPackage extends AbstractPackage
 
     public void process()
     {
-        procRels( "_rels/.rels" );
+        procRels( "_rels/.rels" ); // kicks-off spidering process
 
         // enrich with MIME type info from the Content Types
         try
         {
             XMLReader parser = XMLReaderFactory.createXMLReader();
-            OOXMLContentTypeHandler h = new OOXMLContentTypeHandler( this.col );
+            OOXMLContentTypeHandler h = new OOXMLContentTypeHandler( this.col, this.dtm );
             parser.setContentHandler( h );
 
             String ctu = getSession().getUrlForEntry( "[Content_Types].xml" ).toString();
@@ -101,14 +101,12 @@ public class OPCPackage extends AbstractPackage
                 OOXMLTarget t = iter.next();
                 this.col.add( t );
 
-                String f = t.getTargetFolder();
-                if( !this.foldersProbed.contains( f ) )
-                {
-                    this.foldersProbed.add( f );
-                    String potentialRelsUrl = f + "/_rels/" + t.getFilename() + ".rels";
-                    logger.debug( "Probing new target folder: " + potentialRelsUrl );
-                    procRels( potentialRelsUrl ); // recurse
-                }
+                String f = t.getTargetFolder(); // gets the folder in which the target is
+                                                // located
+
+                String potentialRelsUrl = f + "_rels/" + t.getFilename() + ".rels";
+                logger.debug( "*** Probing new possible target folder: " + potentialRelsUrl );
+                procRels( potentialRelsUrl ); // recurse
 
             }
 

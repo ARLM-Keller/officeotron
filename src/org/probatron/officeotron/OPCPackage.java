@@ -19,6 +19,7 @@
 package org.probatron.officeotron;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
@@ -31,8 +32,8 @@ public class OPCPackage extends AbstractPackage
 {
     static Logger logger = Logger.getLogger( OPCPackage.class );
     private OOXMLTargetCollection col = new OOXMLTargetCollection();
-    // private ArrayList< String > foldersProbed = new ArrayList< String >();
-     OOXMLDefaultTypeMap dtm = new OOXMLDefaultTypeMap();
+    private ArrayList< String > partsProbed = new ArrayList< String >();
+    OOXMLDefaultTypeMap dtm = new OOXMLDefaultTypeMap();
 
 
     // public String systemId;
@@ -99,10 +100,21 @@ public class OPCPackage extends AbstractPackage
             while( iter.hasNext() )
             {
                 OOXMLTarget t = iter.next();
+
+                String pn = t.getTargetAsPartName();
+                if( partsProbed.contains( pn ) )
+                {
+                    continue;
+                }
+                else
+                {
+                    partsProbed.add( pn );
+                }
+
                 this.col.add( t );
 
                 String f = t.getTargetFolder(); // gets the folder in which the target is
-                                                // located
+                // located
 
                 String potentialRelsUrl = f + "_rels/" + t.getFilename() + ".rels";
                 logger.debug( "*** Probing new possible target folder: " + potentialRelsUrl );

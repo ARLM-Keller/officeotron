@@ -27,7 +27,8 @@ import java.util.UUID;
 import org.apache.log4j.Logger;
 import org.probatron.officeotron.Utils;
 import org.probatron.officeotron.ValidationReport;
-import org.probatron.officeotron.zip.ZipArchive;
+import org.xmlopen.zipspy.ZipArchive;
+
 
 public class ValidationSession
 {
@@ -95,8 +96,11 @@ public class ValidationSession
 
         getCommentary().addComment( "Inspecting ZIP ..." );
         getCommentary().incIndent();
+        
+        InputStream is = getPackageStream();
+        logger.debug("stream="+is);
 
-        this.zipArchive = new ZipArchive( this );
+        this.zipArchive = new ZipArchive( is  );
         if( zipArchive.getLocalHeaderCount() != zipArchive.getCentralRecordCount() )
         {
             getCommentary().addComment( "WARN",
@@ -110,6 +114,8 @@ public class ValidationSession
         }
 
         onExtendedZipInspection();
+        
+        Utils.streamClose( is );
 
         String fn = Store.getDirectory( uuid ) + File.separator + uuid + "-zip.xml";
         try

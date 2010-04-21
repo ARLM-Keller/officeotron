@@ -90,14 +90,15 @@ public class ODFValidationSession extends ValidationSession
     {
         ODFPackage mft = parseManifest();
         processManifestDocs( mft );
-        
-        if( uses12 && getZipArchive().usesDataDescriptors())
+
+        if( uses12 && getZipArchive().usesDataDescriptors() )
         {
-            getCommentary().addComment( "ERROR", "ZIP is a non-conformant draft ODF 1.2 package (data descriptors detected)" );
-            
-            
+            getCommentary()
+                    .addComment( "ERROR",
+                            "ZIP is a non-conformant draft ODF 1.2 package (data descriptors detected)" );
+
         }
-        
+
         getCommentary().addComment(
                 "Grand total count of validity errors: " + getCommentary().getErrCount() );
     }

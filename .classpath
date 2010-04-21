@@ -8,5 +8,6 @@
 	<classpathentry kind="lib" path="etc/lib/servlet-api.jar"/>
 	<classpathentry kind="lib" path="etc/lib/xercesImpl.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="etc/lib/zipspy-0.1.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

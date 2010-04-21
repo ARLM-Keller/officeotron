@@ -293,36 +293,6 @@ public class Utils
     }
 
 
-    public static int readIntLittle( InputStream is ) throws IOException
-    {
-        byte b[] = new byte[ 4 ];
-        is.read( b );
-
-        int n = ( 0x000000FF & ( ( int )b[ 3 ] ) );
-        n <<= 8;
-        n |= ( 0x000000FF & ( ( int )b[ 2 ] ) );
-        n <<= 8;
-        n |= ( 0x000000FF & ( ( int )b[ 1 ] ) );
-        n <<= 8;
-        n |= ( 0x000000FF & ( ( int )b[ 0 ] ) );
-
-        return n;
-    }
-
-
-    public static short readShortLittle( InputStream is ) throws IOException
-    {
-        byte b[] = new byte[ 2 ];
-        is.read( b );
-
-        int n = ( 0x000000FF & ( ( int )b[ 1 ] ) );
-        n <<= 8;
-        n |= ( 0x000000FF & ( ( int )b[ 0 ] ) );
-
-        return ( short )n;
-    }
-
-
     public static boolean deleteDir( File dir )
     {
         if( dir.isDirectory() )
@@ -343,41 +313,6 @@ public class Utils
     }
 
 
-    public static String makeElement( String name, Object o )
-    {
-        StringBuffer sb = new StringBuffer();
 
-        sb.append( "<" );
-        sb.append( name );
-        sb.append( ">" );
-        sb.append( o.toString() );
-        sb.append( "</" );
-        sb.append( name );
-        sb.append( ">" );
-
-        return sb.toString();
-    }
-
-
-    public static String makeByteElement( String name, byte[] b )
-    {
-        StringBuffer sb = new StringBuffer();
-
-        sb.append( "<" );
-        sb.append( name );
-        sb.append( ">" );
-        for( int i = 0; i < b.length; i++ )
-        {
-            sb.append( "<byte>" );
-            sb.append( Integer.toHexString( ( 0x000000FF & ( ( int )b[ i ] ) ) ).toUpperCase() );
-            sb.append( "</byte>" );
-        }
-
-        sb.append( "</" );
-        sb.append( name );
-        sb.append( ">" );
-
-        return sb.toString();
-    }
 
 }

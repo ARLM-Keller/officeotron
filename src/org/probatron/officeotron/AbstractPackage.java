@@ -19,18 +19,15 @@
 package org.probatron.officeotron;
 
 import org.probatron.officeotron.sessionstorage.ValidationSession;
-import org.probatron.officeotron.zip.ZipArchive;
 
 public class AbstractPackage
 {
     ValidationSession vs;
-    
 
 
     public AbstractPackage( ValidationSession vs )
     {
         this.vs = vs;
-
 
     }
 
@@ -39,6 +36,5 @@ public class AbstractPackage
     {
         return this.vs;
     }
-
 
 }

@@ -24,8 +24,6 @@ import org.apache.log4j.Logger;
 import org.probatron.officeotron.sessionstorage.ValidationSession;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
-import org.xml.sax.SAXNotRecognizedException;
-import org.xml.sax.SAXNotSupportedException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
 
@@ -115,32 +113,32 @@ public class OOXMLValidationSession extends ValidationSession
             // It seems we can determine the claimed MIME type of a part by 3 methods
             //
             // 1. A direct override from [Content_Types].xml
-            // 2. An association between relationship type and MIME type in the IS itself (?)
-            // 3. A default extension/type mapping as given in [Content_Types].xml
+            // or
+            // 2. A default extension/type mapping as given in [Content_Types].xml
 
             OOXMLTarget t = opc.getEntryCollection().get( i );
             String mt = t.getMimeType();
 
             logger.debug( "Validating entry of MIME type: " + mt );
 
-            OOXMLSchemaMapping osm = OOXMLSchemaMap.getMappingForContentType( mt );            
-            
+            OOXMLSchemaMapping osm = OOXMLSchemaMap.getMappingForContentType( mt );
+
             // not found? see if we can determine type from the extension
             if( osm == null )
             {
-                logger.debug( "Trying to find MIME type for extension " + t.getExtension());
+                logger.debug( "Trying to find MIME type for extension " + t.getExtension() );
                 mt = opc.dtm.get( t.getExtension() );
-                osm = OOXMLSchemaMap.getMappingForContentType( mt );               
-                
+                osm = OOXMLSchemaMap.getMappingForContentType( mt );
+
             }
-            
+
             // still not found ... sorry
             if( osm == null )
             {
                 this.getCommentary().addComment(
                         "Cannot determine schema for Part named (\"<![CDATA["
                                 + t.getTargetAsPartName() + "]]>\")" );
-                logger.debug( "Cannot determine schema for " + t);
+                logger.debug( "Cannot determine schema for " + t );
 
             }
             else
@@ -157,20 +155,20 @@ public class OOXMLValidationSession extends ValidationSession
     {
         synchronized( OOXMLValidationSession.class )
         {
-            
+
             String schemaName = osm.getSchemaName();
             getCommentary().addComment(
                     "Validating part \"" + t.getTargetAsPartName() + "\" using schema \""
                             + osm.getSchemaName() + "\" ..." );
             getCommentary().incIndent();
-            
-            if( osm.getContentType().equals( "application/vnd.openxmlformats-officedocument.vmlDrawing" ))
+
+            if( osm.getContentType().equals(
+                    "application/vnd.openxmlformats-officedocument.vmlDrawing" ) )
             {
                 logger.debug( "VML found" );
-                getCommentary().addComment( "WARN", "Warning: deprecated content (VML) detected" );
-                
-                
-                
+                getCommentary().addComment( "WARN",
+                        "Warning: deprecated content (VML) detected" );
+
             }
 
             if( schemaName == null || schemaName.length() == 0 )
@@ -254,18 +252,9 @@ public class OOXMLValidationSession extends ValidationSession
                             .getNs()
                             + " " + schemaUrl );
         }
-        catch( SAXNotRecognizedException e )
+        catch( Exception e )
         {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        catch( SAXNotSupportedException e )
-        {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        catch( SAXException e )
-        {
+
             // TODO Auto-generated catch block
             e.printStackTrace();
         }

@@ -48,6 +48,7 @@
 				<pathelement location="${lib}/log4j-1.2.15.jar" />
 				<pathelement location="${lib}/jing.jar" />
 				<pathelement location="${lib}/junit-4.6.jar" />
+				<pathelement location="${lib}/zipspy-0.1.0.jar" />
 			</classpath>
 		</javac>
 	</target>

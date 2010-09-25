@@ -17,7 +17,7 @@ public class Driver
     {
         // set up log message format, etc.
         String logLvl = System.getProperty( "property://probatron.org/officeotron-log-level" );
-        logLvl = ( logLvl == null ) ? "DEBUG" : logLvl;
+        logLvl = ( logLvl == null ) ? "ERROR" : logLvl;
 
         Properties p = new Properties();
         p.setProperty( "log4j.rootCategory", logLvl + ", A1" );
@@ -33,30 +33,33 @@ public class Driver
     public static void main( String[] args )
     {
         String fn = args[ 0 ];
-        logger.debug( "Command line request to validate file:" + new File(fn).getAbsolutePath() );
-        Store.init( "c:\\officeotron", "cmd /c unzip" );
-        
+        logger.debug( "Command line request to validate file:"
+                + new File( fn ).getAbsolutePath() );
+        Store.init( System.getProperty( "java.io.tmpdir" ), "unzip" );
+
         CommandLineSubmission cls = new CommandLineSubmission( fn );
-        
-        ValidationSession vs = Utils.autoCreateValidationSession( cls, "file:C:\\tomcat-5.5\\webapps\\29500T\\" );
+
+        ValidationSession vs = Utils.autoCreateValidationSession( cls, new ReportFactory() {
+            public ValidationReport create()
+            {
+                return new StdioValidationReport();
+            }
+        } );
+
         vs.prepare();
         vs.validate();
-       
-        
-      //  vs.cleanup();
-        
+
+        vs.cleanup();
+
         try
         {
-            vs.getCommentary().streamOut( System.out  );
+            vs.getCommentary().streamOut();
         }
         catch( IOException e )
         {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        
-        
-        
-        
+
     }
 }

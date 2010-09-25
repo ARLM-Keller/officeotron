@@ -19,6 +19,7 @@
 package org.probatron.officeotron;
 
 import java.io.IOException;
+import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.probatron.officeotron.sessionstorage.ValidationSession;
@@ -33,10 +34,10 @@ public class OOXMLValidationSession extends ValidationSession
     private String schemaUrlBase;
 
 
-    public OOXMLValidationSession( String filename, String schemaUrlBase )
+    public OOXMLValidationSession( UUID uuid, ReportFactory reportFactory )
     {
-        super( filename );
-        this.schemaUrlBase = schemaUrlBase;
+        super( uuid, reportFactory );
+       
     }
 
 
@@ -242,7 +243,7 @@ public class OOXMLValidationSession extends ValidationSession
 
             parser.setErrorHandler( h );
 
-            String schemaUrl = this.schemaUrlBase + osm.getSchemaName();
+            String schemaUrl = ClassLoader.getSystemResource( "schema/" + osm.getSchemaName()).toString();
             logger.debug( "Selecting XSD schema: " + schemaUrl );
 
             parser.setFeature( "http://xml.org/sax/features/validation", true );

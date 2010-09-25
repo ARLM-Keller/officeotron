@@ -18,17 +18,16 @@
 package org.probatron.officeotron.sessionstorage;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
+import org.probatron.officeotron.ReportFactory;
 import org.probatron.officeotron.Utils;
 import org.probatron.officeotron.ValidationReport;
 import org.xmlopen.zipspy.ZipArchive;
-
 
 public class ValidationSession
 {
@@ -36,16 +35,17 @@ public class ValidationSession
 
     private UUID uuid;
     private String filename;
-    private ValidationReport commentary = new ValidationReport();
+    private ValidationReport commentary;
     protected int errCount;
-    private boolean donePrep;
     private ZipArchive zipArchive;
 
 
-    public ValidationSession( String filename )
+    public ValidationSession( UUID uuid, ReportFactory reportFactory )
     {
         assert Store.tmpFolder != null : "Store not initialized";
-        this.filename = filename;
+        this.uuid = uuid;
+        this.filename = Store.asFilename( uuid );
+        this.commentary = reportFactory.create();
     }
 
 
@@ -83,24 +83,13 @@ public class ValidationSession
     final public void prepare()
     {
         logger.debug( "Preparing session" );
-        try
-        {
-            File f = new File( this.filename );
-            FileInputStream fis = new FileInputStream( f );
-            this.uuid = Store.putZippedResource( fis );
-        }
-        catch( Exception e )
-        {
-            logger.fatal( e.getMessage() );
-        }
 
         getCommentary().addComment( "Inspecting ZIP ..." );
         getCommentary().incIndent();
-        
-        InputStream is = getPackageStream();
-        logger.debug("stream="+is);
 
-        this.zipArchive = new ZipArchive( is  );
+        InputStream is = getPackageStream();
+
+        this.zipArchive = new ZipArchive( is );
         if( zipArchive.getLocalHeaderCount() != zipArchive.getCentralRecordCount() )
         {
             getCommentary().addComment( "WARN",
@@ -114,8 +103,13 @@ public class ValidationSession
         }
 
         onExtendedZipInspection();
-        
         Utils.streamClose( is );
+
+        String theZip = Store.getDirectory( uuid ) + File.separator + uuid;
+        if( !new File( theZip ).delete() )
+        {
+            logger.warn( "Attempt to delete downloaded resource failed" );
+        }
 
         String fn = Store.getDirectory( uuid ) + File.separator + uuid + "-zip.xml";
         try
@@ -128,7 +122,6 @@ public class ValidationSession
         }
         getCommentary().decIndent();
 
-        donePrep = true;
     }
 
 
@@ -140,6 +133,7 @@ public class ValidationSession
 
     public void cleanup()
     {
+        logger.info( "Performing cleanup" );
         Store.delete( uuid );
     }
 
@@ -159,7 +153,7 @@ public class ValidationSession
 
     public void validate()
     {
-       
+
     }
 
 }

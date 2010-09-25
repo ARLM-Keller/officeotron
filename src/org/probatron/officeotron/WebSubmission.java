@@ -38,7 +38,6 @@ public class WebSubmission extends Submission
     static Logger logger = Logger.getLogger( WebSubmission.class );
 
     private HttpServletRequest request;
-    UUID savedFileUuid;
     private String responseErr;
 
 
@@ -92,8 +91,11 @@ public class WebSubmission extends Submission
 
                 if( name.equalsIgnoreCase( "candidate" ) )
                 {
-                    this.savedFileUuid = Store.putZippedResource( sis ); // closes stream
-                    logger.debug( "Persisted candidate item with UUID: " + this.savedFileUuid );
+                    this.uuid = Store.putZippedResource( sis );
+                    sis.close();
+                    sis = null;
+                    System.gc();
+                    logger.debug( "Persisted candidate item with UUID: " + this.uuid );
 
                 }
                 else
@@ -110,6 +112,7 @@ public class WebSubmission extends Submission
             logger.fatal( e.getMessage() );
             throw new RuntimeException( e.getMessage() );
         }
+
     }
 
 
@@ -118,7 +121,7 @@ public class WebSubmission extends Submission
     {
         logger.debug( "Processing direct submission" );
         InputStream sis = request.getInputStream();
-        this.savedFileUuid = Store.putZippedResource( sis ); // closes stream
+        this.uuid = Store.putZippedResource( sis ); // closes stream
 
         Enumeration< String > en = request.getParameterNames();
         while( en.hasMoreElements() )
@@ -133,12 +136,12 @@ public class WebSubmission extends Submission
     @Override
     public String getCandidateFile()
     {
-        if( savedFileUuid == null )
+        if( uuid == null )
         {
             throw new IllegalStateException( "No resource has been localized" );
         }
 
-        return Store.asFilename( savedFileUuid );
+        return Store.asFilename( uuid );
     }
 
 

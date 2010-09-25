@@ -32,13 +32,7 @@
   <context-param>
     <param-name>max-upload</param-name>
     <param-value>500000</param-value>
-    <description>The base URL of the web application</description>
-  </context-param>
-  
-  <context-param>
-    <param-name>ooxml-schema-base</param-name>
-    <param-value>http://localhost:8080/29500T/</param-value>
-    <description>Where the OOXML schemas can be found</description>
+    <description>Max size of submissions</description>
   </context-param>
   
   <context-param>

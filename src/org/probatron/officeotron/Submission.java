@@ -17,6 +17,8 @@
  */
 
 package org.probatron.officeotron;
+import java.util.UUID;
+
 import org.apache.log4j.Logger;
 
 /**
@@ -26,6 +28,7 @@ import org.apache.log4j.Logger;
 abstract public class Submission
 {
     static Logger logger = Logger.getLogger( Submission.class );
+    UUID uuid;
 
     protected OptionMap optionMap = new OptionMap();
 

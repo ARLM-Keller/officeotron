@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.probatron.officeotron.sessionstorage.ValidationSession;
@@ -50,6 +51,7 @@ public class ODFValidationSession extends ValidationSession
     private static byte[] schema10;
     private static byte[] schema11;
     private static byte[] schema12;
+    private static byte[] manifest12;
 
     private boolean forceIs;
     private boolean checkIds;
@@ -62,12 +64,15 @@ public class ODFValidationSession extends ValidationSession
         {
             schema10 = Utils
                     .derefUrl( new URL(
-                            "http://www.oasis-open.org/committees/download.php/12571/OpenDocument-schema-v1.0-os.rng" ) );
+                            "http://docs.oasis-open.org/office/v1.2/cd05/OpenDocument-v1.2-cd05-schema.rng" ) );
             schema11 = Utils.derefUrl( new URL(
                     "http://docs.oasis-open.org/office/v1.1/OS/OpenDocument-schema-v1.1.rng" ) );
             schema12 = Utils
                     .derefUrl( new URL(
                             "http://docs.oasis-open.org/office/v1.2/part1/cd04/OpenDocument-schema-v1.2-cd04.rng" ) );
+            manifest12 = Utils
+                    .derefUrl( new URL(
+                            "http://docs.oasis-open.org/office/v1.2/cd05/OpenDocument-v1.2-cd05-manifest-schema.rng" ) );
         }
         catch( MalformedURLException e )
         {
@@ -76,9 +81,9 @@ public class ODFValidationSession extends ValidationSession
     }
 
 
-    public ODFValidationSession( String filename, OptionMap optionMap )
+    public ODFValidationSession( UUID uuid, OptionMap optionMap, ReportFactory reportFactory )
     {
-        super( filename );
+        super( uuid, reportFactory );
         this.forceIs = optionMap.getBooleanOption( "force-is" );
         this.checkIds = optionMap.getBooleanOption( "check-ids" );
         logger.trace( "Creating ODFValidationSession. forceIs=" + this.forceIs + "; checkIds="
@@ -91,22 +96,83 @@ public class ODFValidationSession extends ValidationSession
         ODFPackage mft = parseManifest();
         processManifestDocs( mft );
 
-        if( uses12 && getZipArchive().usesDataDescriptors() )
+        // For ODF 1.2, validate the manifest ...
+        if( uses12 )
         {
-            getCommentary()
-                    .addComment( "ERROR",
-                            "ZIP is a non-conformant draft ODF 1.2 package (data descriptors detected)" );
-
+            validateManifest();
         }
+
+        // TODO : not sure about this - need to check the spec.
+        // if( uses12 && getZipArchive().usesDataDescriptors() )
+        // {
+        // getCommentary()
+        // .addComment( "ERROR",
+        // "ZIP is a non-conformant draft ODF 1.2 package (data descriptors detected)" );
+        //
+        // }
 
         getCommentary().addComment(
                 "Grand total count of validity errors: " + getCommentary().getErrCount() );
     }
 
 
+    private void validateManifest()
+    {
+        getCommentary().addComment( "Validating manifest" );
+        getCommentary().incIndent();
+
+        // Create the Jing ValidationDriver
+        PropertyMapBuilder builder = new PropertyMapBuilder();
+        CommentatingErrorHandler h = new CommentatingErrorHandler( getCommentary() );
+        ValidateProperty.ERROR_HANDLER.put( builder, h );
+        ValidationDriver driver = new ValidationDriver( builder.toPropertyMap() );
+        InputStream candidateStream = null;
+        try
+        {
+            driver.loadSchema( new InputSource( new ByteArrayInputStream( manifest12 ) ) );
+            URLConnection conn = new URL( getUrlForEntry( "META-INF/manifest.xml" ).toString() )
+                    .openConnection();
+            candidateStream = conn.getInputStream();
+            boolean isValid = driver.validate( new InputSource( candidateStream ) );
+            if( isValid )
+            {
+                getCommentary().addComment( "Manifest is valid" );
+
+            }
+            else
+            {
+                getCommentary().addComment( "ERROR", "Manifest is invalid" );
+            }
+
+        }
+        catch( MalformedURLException e )
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        catch( SAXException e )
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        catch( IOException e )
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        finally
+        {
+            Utils.streamClose( candidateStream );
+        }
+
+        getCommentary().decIndent();
+    }
+
+
     private ODFPackage parseManifest()
     {
         String manifestUrl = getUrlForEntry( "META-INF/manifest.xml" ).toString();
+
         ODFPackage mft = new ODFPackage( this );
         mft.process( manifestUrl );
         return mft;
@@ -150,7 +216,8 @@ public class ODFValidationSession extends ValidationSession
             if( sniffer.getGenerator() != "" )
             {
                 getCommentary().addComment(
-                        "The generator value is: \"<b>" + sniffer.getGenerator() + "</b>\"" );
+                        "The generator value is: \"<b>" + sniffer.getGenerator().trim()
+                                + "</b>\"" );
             }
             getCommentary().decIndent();
         }

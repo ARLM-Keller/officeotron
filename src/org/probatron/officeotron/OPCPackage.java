@@ -36,8 +36,6 @@ public class OPCPackage extends AbstractPackage
     OOXMLDefaultTypeMap dtm = new OOXMLDefaultTypeMap();
 
 
-    // public String systemId;
-
     public OPCPackage( ValidationSession vs )
     {
         super( vs );

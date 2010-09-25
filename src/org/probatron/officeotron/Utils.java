@@ -130,6 +130,7 @@ public class Utils
             fos = new FileOutputStream( f );
             bis = new ByteArrayInputStream( ba );
             transferBytesToEndOfStream( bis, fos, CLOSE_IN | CLOSE_OUT );
+            System.gc();
         }
         catch( FileNotFoundException e )
         {
@@ -173,13 +174,8 @@ public class Utils
         try
         {
             FileOutputStream fos = new FileOutputStream( f );
-            int flags = CLOSE_OUT;
-            if( closeStream )
-            {
-                flags |= CLOSE_IN;
-            }
+            int flags = closeStream ? ( CLOSE_IN | CLOSE_OUT ) : CLOSE_OUT;
             return Utils.transferBytesToEndOfStream( is, fos, flags );
-
         }
         catch( FileNotFoundException e )
         {
@@ -190,7 +186,7 @@ public class Utils
 
 
     public static ValidationSession autoCreateValidationSession( Submission sub,
-            String schemaUrlBase )
+            ReportFactory reportFactory )
     {
         ValidationSession vs = null;
 
@@ -205,7 +201,7 @@ public class Utils
             if( ba != null )
             {
                 logger.info( "Auto detected ODF package" );
-                vs = new ODFValidationSession( sub.getCandidateFile(), sub.getOptionMap() );
+                vs = new ODFValidationSession( sub.uuid, sub.getOptionMap(), reportFactory );
             }
             else
             {
@@ -217,13 +213,13 @@ public class Utils
 
                     // we need to know where the OOXML schemas are
 
-                    vs = new OOXMLValidationSession( sub.getCandidateFile(), schemaUrlBase ); // FIXME
+                    vs = new OOXMLValidationSession( sub.uuid, reportFactory ); // FIXME
                 }
             }
         }
         catch( MalformedURLException e )
         {
-            logger.info(  e.getMessage() );
+            logger.info( e.getMessage() );
         }
 
         return vs;
@@ -256,6 +252,7 @@ public class Utils
         }
         if( ( closeFlags & CLOSE_OUT ) != 0 )
         {
+
             streamClose( out );
         }
 
@@ -284,7 +281,10 @@ public class Utils
         try
         {
             if( os != null )
+            {
+                os.flush();
                 os.close();
+            }
         }
         catch( Exception e )
         {
@@ -293,26 +293,25 @@ public class Utils
     }
 
 
-    public static boolean deleteDir( File dir )
+    static public boolean deleteDir( File path )
     {
-        if( dir.isDirectory() )
+        logger.info( "Deleting folder " + path );
+        if( path.exists() )
         {
-            String[] children = dir.list();
-            for( int i = 0; i < children.length; i++ )
+            File[] files = path.listFiles();
+            for( int i = 0; i < files.length; i++ )
             {
-                boolean success = deleteDir( new File( dir, children[ i ] ) );
-                if( !success )
+                if( files[ i ].isDirectory() )
                 {
-                    return false;
+                    deleteDir( files[ i ] );
+                }
+                else
+                {
+                    files[ i ].delete();
                 }
             }
         }
-
-        // The directory is now empty so delete it
-        return dir.delete();
+        return ( path.delete() );
     }
-
-
-
 
 }

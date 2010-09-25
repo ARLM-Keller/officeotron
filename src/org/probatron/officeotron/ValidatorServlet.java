@@ -54,6 +54,23 @@ public class ValidatorServlet extends HttpServlet
         PropertyConfigurator.configure( p );
     }
 
+    static private class HttpReportFactory implements ReportFactory
+    {
+        private HttpServletResponse resp;
+
+
+        public HttpReportFactory( HttpServletResponse resp )
+        {
+            this.resp = resp;
+        }
+
+
+        public ValidationReport create()
+        {
+            return new HtmlValidationReport( resp );
+        }
+    }
+
 
     @Override
     protected void doPost( HttpServletRequest req, HttpServletResponse resp )
@@ -80,10 +97,8 @@ public class ValidatorServlet extends HttpServlet
             return;
         }
 
-        String schemaUrlBase = sc.getInitParameter( "ooxml-schema-base" );
-        logger.info( "Using OOXML schemas at: " + schemaUrlBase );
-
-        ValidationSession vs = Utils.autoCreateValidationSession( sub, schemaUrlBase ); // determine
+        ValidationSession vs = Utils.autoCreateValidationSession( sub, new HttpReportFactory(
+                resp ) ); // determine
         // ODF
         // or
         // OOXML
@@ -99,9 +114,8 @@ public class ValidatorServlet extends HttpServlet
         vs.getCommentary().endReport();
         vs.cleanup();
 
-        vs.getCommentary().streamOut( resp );
-        
-        
+        vs.getCommentary().streamOut();
+
     }
 
 

@@ -32,7 +32,6 @@ import org.probatron.officeotron.sessionstorage.ValidationSession;
 public class OPCPackageTest extends TestCase
 {
 
-
     ValidationSession vs1, vs2;
     OPCPackage opc, opc2;
 
@@ -59,16 +58,28 @@ public class OPCPackageTest extends TestCase
         // special set-up for testing
         Store.init( "c:\\officeotron", "cmd /c unzip" );
 
-
         File f = new File( "etc/test-data/maria.xlsx" );
-        FileInputStream fis = new FileInputStream( f );
-        vs1 = new OOXMLValidationSession( null, null );
+
+        vs1 = new OOXMLValidationSession( null, new ReportFactory() {
+            public ValidationReport create()
+            {
+                return new StdioValidationReport();
+            }
+        } );
+
         opc = new OPCPackage( vs1 );
         opc.process();
 
         f = new File( "etc/test-data/torture.pptx" );
-        fis = new FileInputStream( f );
-        vs2 = new OOXMLValidationSession( null, null );
+        FileInputStream fis = new FileInputStream( f );
+        vs2 = new OOXMLValidationSession( null,
+
+        new ReportFactory() {
+            public ValidationReport create()
+            {
+                return new StdioValidationReport();
+            }
+        } );
         opc2 = new OPCPackage( vs2 );
         opc2.process();
 
@@ -80,8 +91,8 @@ public class OPCPackageTest extends TestCase
     @Override
     protected void tearDown() throws Exception
     {
-    //    Store.delete( vs1.getUuid() );
-    //    Store.delete( vs2.getUuid() );
+        // Store.delete( vs1.getUuid() );
+        // Store.delete( vs2.getUuid() );
         super.tearDown();
     }
 
@@ -111,8 +122,7 @@ public class OPCPackageTest extends TestCase
         assertTrue( t != null );
         t = opc2.getEntryCollection().getTargetByName( "/ppt/slides/slide1.xml" );
         assertTrue( t != null );
-        
-        
+
         t = opc2.getEntryCollection().getTargetByName( "/ppt/slides/slide999.xml" );
         assertFalse( t != null );
     }

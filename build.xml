@@ -25,7 +25,7 @@
 	<description>Office-o-tron Build</description>
 
 	<!-- set global properties for this build -->
-	<property name="version" value="0.5.5-Beta" />
+	<property name="version" value="0.6.0" />
 	<property name="src" location="src" />
 	<property name="build" location="build" />
 	<property name="dist" location="dist/officeotron" />
@@ -54,7 +54,7 @@
 	</target>
 
 
-	<target name="jar" depends="compile" description="makes the JAR">
+	<target name="jar" depends="compile" description="makes the application JAR">
 		<!-- Create the build directories -->
 		<mkdir dir="${build}/lib" />
 		<mkdir dir="${dist}/temp" />
@@ -89,7 +89,7 @@
 	</target>
 
 
-	<target name="webapp" depends="jar" description="Builds the Web application">
+	<target name="webapp" depends="jar" description="Builds the JAR">
 		<!-- Create the webapp directories -->
 		<mkdir dir="${dist}" />
 		<mkdir dir="${dist}/WEB-INF/lib" />

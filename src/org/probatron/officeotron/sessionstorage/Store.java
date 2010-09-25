@@ -39,7 +39,6 @@ public class Store
     static String unzipInvocation;
 
 
- 
     public static void init( String tmpFolder, String unzipInvocation )
     {
         Store.tmpFolder = tmpFolder;
@@ -55,37 +54,20 @@ public class Store
         new File( getDirectory( uuid ) ).mkdir();
         File cwd = new File( getDirectory( uuid ) );
 
-        long written = Utils.streamToFile( is, fn, true );
+        long written = Utils.streamToFile( is, fn, false );
 
         logger.debug( "Wrote " + written + " bytes to file" );
 
-        // get the zipinfo
-//        String cmd = unzipInvocation + " -Z -v " + asFilename( uuid ) + " >"
-//                + getDirectory( uuid ) + File.separator + uuid + "-zipinfo.txt";
-//
-//        try
-//        {
-//
-//            Process p = Runtime.getRuntime().exec( cmd, null, cwd );
-//            int ret = p.waitFor();
-//            logger.debug( "Done cmd: " + cmd + ". return code=" + ret );
-//
-//            cmd = unzipInvocation + " -Z " + asFilename( uuid ) + " >" + getDirectory( uuid )
-//                    + File.separator + uuid + "-ziplist.txt";
-//
-//        }
-//        catch( Exception e )
-//        {
-//            logger.fatal( e.getMessage() );
-//        }
-
         // unzip it
-        String cmd = unzipInvocation + " -qq " + asFilename( uuid ) + " -d" + getDirectory( uuid );
+        String cmd = unzipInvocation + " -qq " + asFilename( uuid ) + " -d"
+                + getDirectory( uuid );
         try
         {
 
             Process p = Runtime.getRuntime().exec( cmd, null, cwd );
             int ret = p.waitFor();
+            
+            p.destroy();
             logger.debug( "Done cmd: " + cmd + ". return code=" + ret );
 
         }
@@ -106,7 +88,7 @@ public class Store
 
         try
         {
-            is = new  FileInputStream( f ) ;
+            is = new FileInputStream( f );
         }
         catch( FileNotFoundException e )
         {
@@ -166,7 +148,7 @@ public class Store
 
     public static String asFilename( UUID uuid )
     {
-        return getDirectory( uuid ) + File.separator + uuid;
+        return getDirectory( uuid ) + File.separator + uuid + ".bin";
     }
 
 }

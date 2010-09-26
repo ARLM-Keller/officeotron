@@ -183,7 +183,32 @@ public class ODFValidationSession extends ValidationSession
     {
         for( int i = 0; i < mft.getItemRefs().size(); i++ )
         {
+            String mimeType = mft.getItemTypes().get( i );
             String entry = mft.getItemRefs().get( i );
+            
+            if( entry.endsWith( "/"))
+            {
+                // can't validate folders
+                continue;
+            }
+            
+            if(  mimeType.equals( "" ) )
+            {
+                getCommentary().addComment(
+                        "WARN",
+                        "Manifest entry for \"" + entry
+                                + "\" should have a MIME type, but has an empty string" );
+            }
+            
+            if( mimeType.indexOf( "xml" ) == -1 )
+            {
+                // can't validate non-xml resources -- but try stuff with a ".xml" ext anyway
+                if( !entry.trim().endsWith( ".xml" ) )
+                {
+                    logger.debug( "Skipping entry " + entry );
+                    continue;
+                }
+            }
 
             String entryUrl = getUrlForEntry( entry ).toString();
 
@@ -200,10 +225,11 @@ public class ODFValidationSession extends ValidationSession
             }
             catch( Exception e )
             {
-                logger.fatal( "Referenced resource in manifest cannot be found" );
-                getCommentary().addComment( "FATAL",
+                logger.fatal( "Referenced resource in manifest cannot be found/processed" );
+                getCommentary().addComment( "WARN",
                         "Referenced resource in manifest cannot be found/processed" );
-                return;
+                getCommentary().decIndent();
+                continue;
             }
 
             if( sd.getRootNs().equals( ODFSniffer.ODF_OFFICE_NS ) )

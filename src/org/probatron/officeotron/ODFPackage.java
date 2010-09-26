@@ -34,6 +34,7 @@ public class ODFPackage extends AbstractPackage implements ContentHandler
     static Logger logger = Logger.getLogger( ODFPackage.class );
     private final static String ODF_MANIFEST_NS = "urn:oasis:names:tc:opendocument:xmlns:manifest:1.0";
     private ArrayList< String > itemRefs = new ArrayList< String >();
+    private ArrayList< String > itemTypes = new ArrayList< String >();
 
 
     public ODFPackage( ValidationSession vs )
@@ -49,7 +50,7 @@ public class ODFPackage extends AbstractPackage implements ContentHandler
             XMLReader parser = XMLReaderFactory.createXMLReader();
             parser.setContentHandler( this );
             parser.setEntityResolver( new BlankingResolver( null ) );
-         
+
             parser.parse( sysId );
         }
         catch( Exception e )
@@ -174,12 +175,10 @@ public class ODFPackage extends AbstractPackage implements ContentHandler
         {
             logger.debug( "processing file-entry in manifest" );
             String mimeType = Utils.getQAtt( atts, ODF_MANIFEST_NS, "media-type" );
-            if( mimeType.indexOf( "/xml" ) != -1 )
-            {
-                String entryName = Utils.getQAtt( atts, ODF_MANIFEST_NS, "full-path" );
-                itemRefs.add( entryName );
-                logger.debug( "Found entry: " + entryName );
-            }
+            itemTypes.add( mimeType );
+            String entryName = Utils.getQAtt( atts, ODF_MANIFEST_NS, "full-path" );
+            itemRefs.add( entryName );
+            logger.debug( "Found entry: " + entryName );
         }
     }
 
@@ -201,6 +200,15 @@ public class ODFPackage extends AbstractPackage implements ContentHandler
     public ArrayList< String > getItemRefs()
     {
         return itemRefs;
+    }
+
+
+    /**
+     * @return the itemTypes
+     */
+    public ArrayList< String > getItemTypes()
+    {
+        return itemTypes;
     }
 
 }

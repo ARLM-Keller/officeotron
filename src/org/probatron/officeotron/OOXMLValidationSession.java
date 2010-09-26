@@ -31,13 +31,11 @@ import org.xml.sax.helpers.XMLReaderFactory;
 public class OOXMLValidationSession extends ValidationSession
 {
     static Logger logger = Logger.getLogger( OOXMLValidationSession.class );
-    private String schemaUrlBase;
 
 
     public OOXMLValidationSession( UUID uuid, ReportFactory reportFactory )
     {
         super( uuid, reportFactory );
-       
     }
 
 
@@ -218,13 +216,11 @@ public class OOXMLValidationSession extends ValidationSession
                 }
                 catch( SAXException e )
                 {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+                    logger.error( e + " " + e.getMessage() );
                 }
                 catch( IOException e )
                 {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+                    logger.error( e + " " + e.getMessage() );
                 }
             }
 
@@ -240,10 +236,13 @@ public class OOXMLValidationSession extends ValidationSession
         try
         {
             parser = XMLReaderFactory.createXMLReader();
+            logger.debug( "Setting erorr handler " + h + " for parser " + parser + "; schema="
+                    + osm.getSchemaName() );
 
             parser.setErrorHandler( h );
 
-            String schemaUrl = ClassLoader.getSystemResource( "schema/" + osm.getSchemaName()).toString();
+            String schemaUrl = ClassLoader.getSystemResource( "schema/" + osm.getSchemaName() )
+                    .toString();
             logger.debug( "Selecting XSD schema: " + schemaUrl );
 
             parser.setFeature( "http://xml.org/sax/features/validation", true );
@@ -255,13 +254,11 @@ public class OOXMLValidationSession extends ValidationSession
         }
         catch( Exception e )
         {
-
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error( "Exception configuring for schema " + osm.getSchemaName()
+                    + ": " + e + " " + e.getMessage() );
         }
 
         return parser;
 
     }
-
 }

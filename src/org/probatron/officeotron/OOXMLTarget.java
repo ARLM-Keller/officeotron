@@ -147,7 +147,7 @@ public class OOXMLTarget
 
             result = resolved.toString();
 
-            if( !result.startsWith( "/" ) )
+            if( !result.startsWith( "/" ) && result.indexOf( "//:" ) == -1 )
             {
                 result = "/" + result;
             }

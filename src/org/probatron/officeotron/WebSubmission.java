@@ -21,7 +21,6 @@ package org.probatron.officeotron;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Enumeration;
-import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 

@@ -93,7 +93,7 @@ public class ValidationSession
         if( zipArchive.getLocalHeaderCount() != zipArchive.getCentralRecordCount() )
         {
             getCommentary().addComment( "WARN",
-                    "Mismatch between local header and central record" );
+                    "Mismatch between local header and central record (weakened ZIP resilience)" );
         }
         else
         {

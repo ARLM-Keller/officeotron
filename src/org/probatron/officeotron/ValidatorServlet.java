@@ -64,7 +64,6 @@ public class ValidatorServlet extends HttpServlet
             this.resp = resp;
         }
 
-
         public ValidationReport create()
         {
             return new HtmlValidationReport( resp );

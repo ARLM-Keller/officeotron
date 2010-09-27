@@ -93,7 +93,24 @@ public class ODFValidationSession extends ValidationSession
 
     public void validate()
     {
-        ODFPackage mft = parseManifest();
+        ODFPackage mft;
+
+        try
+        {
+            mft = parseManifest();
+        }
+        catch( SAXException e )
+        {
+            getCommentary().addComment( "ERROR", "The manifest cannot be parsed" );
+            return;
+        }
+        catch( IOException e )
+        {
+            getCommentary().addComment( "ERROR",
+                    "The manifest cannot be extracted or is corrupt" );
+            return;
+        }
+
         processManifestDocs( mft );
 
         // For ODF 1.2, validate the manifest ...
@@ -169,7 +186,7 @@ public class ODFValidationSession extends ValidationSession
     }
 
 
-    private ODFPackage parseManifest()
+    private ODFPackage parseManifest() throws SAXException, IOException
     {
         String manifestUrl = getUrlForEntry( "META-INF/manifest.xml" ).toString();
 
@@ -185,21 +202,21 @@ public class ODFValidationSession extends ValidationSession
         {
             String mimeType = mft.getItemTypes().get( i );
             String entry = mft.getItemRefs().get( i );
-            
-            if( entry.endsWith( "/"))
+
+            if( entry.endsWith( "/" ) )
             {
                 // can't validate folders
                 continue;
             }
-            
-            if(  mimeType.equals( "" ) )
+
+            if( mimeType.equals( "" ) )
             {
                 getCommentary().addComment(
                         "WARN",
                         "Manifest entry for \"" + entry
                                 + "\" should have a MIME type, but has an empty string" );
             }
-            
+
             if( mimeType.indexOf( "xml" ) == -1 )
             {
                 // can't validate non-xml resources -- but try stuff with a ".xml" ext anyway

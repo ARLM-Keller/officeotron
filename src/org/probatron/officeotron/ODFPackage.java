@@ -18,6 +18,7 @@
 
 package org.probatron.officeotron;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
@@ -43,22 +44,20 @@ public class ODFPackage extends AbstractPackage implements ContentHandler
     }
 
 
-    void process( String sysId )
+    /**
+     * Harvests the manifest collecting information about entries in it.
+     * 
+     * @param sysId
+     *            the location of the manifest
+     * @throws SAXException
+     * @throws IOException
+     */
+    void process( String sysId ) throws SAXException, IOException
     {
-        try
-        {
-            XMLReader parser = XMLReaderFactory.createXMLReader();
-            parser.setContentHandler( this );
-            parser.setEntityResolver( new BlankingResolver( null ) );
-
-            parser.parse( sysId );
-        }
-        catch( Exception e )
-        {
-            // this will have already been parsed once, so this should never happen
-            e.printStackTrace();
-            throw new RuntimeException( e.getMessage() );
-        }
+        XMLReader parser = XMLReaderFactory.createXMLReader();
+        parser.setContentHandler( this );
+        parser.setEntityResolver( new BlankingResolver( null ) );
+        parser.parse( sysId );
     }
 
 

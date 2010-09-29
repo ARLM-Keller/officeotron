@@ -308,10 +308,12 @@ public class Utils
                 else
                 {
                     files[ i ].delete();
+                    System.gc(); // hack to try and make JVM/Windows JFDI
                 }
             }
         }
-        return ( path.delete() );
+        boolean ret = path.delete();
+        return ret;
     }
 
 }

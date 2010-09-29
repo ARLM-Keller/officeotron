@@ -20,6 +20,9 @@ package org.probatron.officeotron;
 
 import java.io.IOException;
 import java.util.Properties;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -30,20 +33,19 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.probatron.officeotron.sessionstorage.Store;
-import org.probatron.officeotron.sessionstorage.ValidationSession;
 
 // TODO: add a friendly info page for when n00bs try to GET this
 @SuppressWarnings("serial")
 public class ValidatorServlet extends HttpServlet
 {
-
+    private static Semaphore sem;
     static Logger logger = Logger.getLogger( ValidatorServlet.class );
 
     static
     {
         // set up log message format, etc.
         String logLvl = System.getProperty( "property://probatron.org/officeotron-log-level" );
-        logLvl = ( logLvl == null ) ? "DEBUG" : logLvl;
+        logLvl = ( logLvl == null ) ? "ERROR" : logLvl;
 
         Properties p = new Properties();
         p.setProperty( "log4j.rootCategory", logLvl + ", A1" );
@@ -54,22 +56,6 @@ public class ValidatorServlet extends HttpServlet
         PropertyConfigurator.configure( p );
     }
 
-    static private class HttpReportFactory implements ReportFactory
-    {
-        private HttpServletResponse resp;
-
-
-        public HttpReportFactory( HttpServletResponse resp )
-        {
-            this.resp = resp;
-        }
-
-        public ValidationReport create()
-        {
-            return new HtmlValidationReport( resp );
-        }
-    }
-
 
     @Override
     protected void doPost( HttpServletRequest req, HttpServletResponse resp )
@@ -77,6 +63,16 @@ public class ValidatorServlet extends HttpServlet
     {
 
         ServletContext sc = getServletContext();
+        synchronized( ValidatorServlet.class )
+        {
+            if( sem == null )
+            {
+                int permits = Integer.parseInt( sc.getInitParameter( "maxproc" ) );
+                sem = new Semaphore( permits );
+                logger.info( "maxproc=" + permits );
+
+            }
+        }
 
         Store.init( sc.getInitParameter( "temp-folder" ), sc
                 .getInitParameter( "unzip-invocation" ) ); // to get the storage layer up and
@@ -96,24 +92,22 @@ public class ValidatorServlet extends HttpServlet
             return;
         }
 
-        ValidationSession vs = Utils.autoCreateValidationSession( sub, new HttpReportFactory(
-                resp ) ); // determine
-        // ODF
-        // or
-        // OOXML
-        if( vs == null )
+        WebTask task = new WebTask( sub, resp );
+    
+        try
         {
-            resp.sendError( 412,
-                    "Submitted resource must be a recognisable Office document package" );
-            return;
+            sem.acquire();
+            task.run();
         }
-
-        vs.prepare();
-        vs.validate();
-        vs.getCommentary().endReport();
-        vs.cleanup();
-
-        vs.getCommentary().streamOut();
+        catch( InterruptedException e )
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        finally
+        {
+            sem.release();
+        }
 
     }
 

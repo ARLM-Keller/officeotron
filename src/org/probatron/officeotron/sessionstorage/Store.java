@@ -61,7 +61,6 @@ public class Store
         UUID uuid = UUID.randomUUID();
         String fn = filename;
         new File( getDirectory( uuid ) ).mkdir();
-        File cwd = new File( getDirectory( uuid ) );
 
         // Save the file locally only for web mode
         if ( webMode ) {

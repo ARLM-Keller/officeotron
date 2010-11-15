@@ -7,12 +7,16 @@ public class StdioValidationReport implements ValidationReport {
 
     private int indent;
     private int errCount;
+    private boolean showInfos;
     
-    public StdioValidationReport() {
+    public StdioValidationReport( boolean showInfos ) {
+    	this.showInfos = showInfos;
     }
     
     public void addComment(String s) {
-    	addComment( "INFO", s );
+    	if ( showInfos ) {
+    		addComment( "INFO", s );
+    	}
     }
 
     public void addComment(String klass, String s) {

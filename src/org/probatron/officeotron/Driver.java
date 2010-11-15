@@ -2,6 +2,7 @@ package org.probatron.officeotron;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
@@ -32,34 +33,45 @@ public class Driver
 
     public static void main( String[] args )
     {
-        String fn = args[ 0 ];
-        logger.debug( "Command line request to validate file:"
-                + new File( fn ).getAbsolutePath() );
+    	ArrayList<String> fns = new ArrayList<String>();
+    	boolean onlyErrors = false;
+    	
+    	for ( int i = 0; i < args.length; i++ ) {
+    		if ( args[i].equals("--errors-only") ) {
+    			onlyErrors = true;
+    		} else {
+    			fns.add( args[i] );
+    		}
+    	}
+    	
+    	final boolean showInfos = !onlyErrors; 
         Store.init( System.getProperty( "java.io.tmpdir" ), "unzip", false );
 
-        CommandLineSubmission cls = new CommandLineSubmission( fn );
+        for (String fn : fns) {
+        	logger.debug( "Validating file " + new File( fn ).getAbsolutePath() );
+        	
+        	CommandLineSubmission cls = new CommandLineSubmission( fn );
 
-        ValidationSession vs = Utils.autoCreateValidationSession( cls, new ReportFactory() {
-            public ValidationReport create()
+            ValidationSession vs = Utils.autoCreateValidationSession( cls, new ReportFactory() {
+                public ValidationReport create()
+                {
+                    return new StdioValidationReport( showInfos );
+                }
+            } );
+
+            vs.prepare();
+            vs.validate();
+
+            vs.cleanup();
+
+            try
             {
-                return new StdioValidationReport();
+                vs.getCommentary().streamOut();
             }
-        } );
-
-        vs.prepare();
-        vs.validate();
-
-        vs.cleanup();
-
-        try
-        {
-            vs.getCommentary().streamOut();
-        }
-        catch( IOException e )
-        {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-
+            catch( IOException e )
+            {
+                e.printStackTrace();
+            }
+		}
     }
 }

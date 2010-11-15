@@ -63,7 +63,7 @@ public class OPCPackageTest extends TestCase
         vs1 = new OOXMLValidationSession( null, new ReportFactory() {
             public ValidationReport create()
             {
-                return new StdioValidationReport();
+                return new StdioValidationReport( true );
             }
         } );
 
@@ -77,7 +77,7 @@ public class OPCPackageTest extends TestCase
         new ReportFactory() {
             public ValidationReport create()
             {
-                return new StdioValidationReport();
+                return new StdioValidationReport( true );
             }
         } );
         opc2 = new OPCPackage( vs2 );

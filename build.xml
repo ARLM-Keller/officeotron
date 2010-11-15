@@ -53,8 +53,22 @@
 		</javac>
 	</target>
 
+	<target name="jar" depends="compile" description="makes the Webapp JAR">
+        <!-- Create the build directories -->
+        <mkdir dir="${build}/lib" />
+        
+        <!-- Put everything in ${build} into the MyProject-${DSTAMP}.jar file -->
+        <jar jarfile="${build}/lib/officeotron-${version}.jar" basedir="${build}/classes" excludes="**/*Test.class">
+            <manifest>
+                <attribute name="Built-By" value="Griffin Brown Digital Publishing Ltd" />
+                <attribute name="Implementation-Vendor" value="Griffin Brown Digital Publishing Ltd" />
+                <attribute name="Implementation-Title" value="Office-o-tron" />
+                <attribute name="Implementation-Version" value="${version}" />
+            </manifest>
+        </jar>
+    </target>
 
-	<target name="jar" depends="compile" description="makes the application JAR">
+	<target name="application" depends="compile" description="makes the application JAR">
 		<!-- Create the build directories -->
 		<mkdir dir="${build}/lib" />
 		<mkdir dir="${dist}/temp" />
@@ -63,19 +77,27 @@
 	    <unjar src="${lib}/log4j-1.2.15.jar" dest="${dist}/temp"/>
 	    <unjar src="${lib}/commons-fileupload-1.2.1.jar" dest="${dist}/temp"/>
 		<unjar src="${lib}/jing.jar" dest="${dist}/temp"/>
+		<unjar src="${lib}/zipspy-0.1.0.jar" dest="${dist}/temp"/>
 		
 		<!-- copy *our* newly-compiled class files -->
 		<copy todir="${dist}/temp">
 		      <fileset dir="${build}/classes">
 		      	  <exclude name="**/*Test.class"/>
-		      	<exclude name="**/Driver.class"/>
 		      </fileset>
 		</copy>
-		<!-- <delete dir="${dist}/temp/META-INF"/> -->
 		
+		<!-- copy the schema files -->
+		<copy todir="${dist}/temp/schema">
+			<fileset dir="${etc}/schema/29500T">
+				<include name="*.xsd"/>
+			</fileset>
+			<fileset dir="${etc}/schema/OPC">
+				<include name="*.xsd"/>
+			</fileset>
+		</copy>
 		
 		<!-- Put everything in ${build} into the MyProject-${DSTAMP}.jar file -->
-		<jar jarfile="${build}/lib/officeotron-${version}.jar" basedir="${dist}/temp">
+        <jar jarfile="dist/officeotron-${version}.jar" basedir="${dist}/temp">
 			<manifest>
 				<attribute name="Built-By" value="Griffin Brown Digital Publishing Ltd" />
 				<attribute name="Implementation-Vendor" value="Griffin Brown Digital Publishing Ltd" />
@@ -85,6 +107,7 @@
 			</manifest>
 		</jar>
 		
+        <delete dir="${dist}/temp/schema"/>
 		<delete dir="${dist}/temp"/>
 	</target>
 
@@ -104,6 +127,16 @@
 			<fileset dir="${lib}/">
 				<include name="**/*.jar" />
 				<exclude name="servlet-api.jar" />
+			</fileset>
+        </copy>
+
+		<!-- schemas -->
+		<copy todir="${dist}/WEB-INF/classes/schema">
+			<fileset dir="${etc}/schema/29500T">
+				<include name="*.xsd"/>
+			</fileset>
+			<fileset dir="${etc}/schema/OPC">
+				<include name="*.xsd"/>
 			</fileset>
 		</copy>
 

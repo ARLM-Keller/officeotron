@@ -18,22 +18,28 @@
 
 package org.probatron.officeotron;
 
+import java.io.FileInputStream;
+
+import org.probatron.officeotron.sessionstorage.Store;
+
 public class CommandLineSubmission extends Submission
 {
-    private String filename;
-
-
     public CommandLineSubmission( String filename )
     {
-        this.filename = filename;
+        FileInputStream is = null;
+        try {
+        	is = new FileInputStream( filename );
+        	uuid = Store.putZippedResource( is, filename );
+        } catch ( Exception e ) {
+        	logger.error( "Can't access file: " + filename );
+        }
     }
 
 
     @Override
     public String getCandidateFile()
     {
-        // TODO Auto-generated method stub
-        return filename;
+        return Store.getFilename( uuid );
     }
 
 }

@@ -90,7 +90,7 @@ public class WebSubmission extends Submission
 
                 if( name.equalsIgnoreCase( "candidate" ) )
                 {
-                    this.uuid = Store.putZippedResource( sis );
+                    this.uuid = Store.putZippedResource( sis, name );
                     sis.close();
                     sis = null;
                     System.gc();
@@ -120,7 +120,7 @@ public class WebSubmission extends Submission
     {
         logger.debug( "Processing direct submission" );
         InputStream sis = request.getInputStream();
-        this.uuid = Store.putZippedResource( sis ); // closes stream
+        this.uuid = Store.putZippedResource( sis, null ); // closes stream
 
         Enumeration< String > en = request.getParameterNames();
         while( en.hasMoreElements() )
@@ -140,7 +140,7 @@ public class WebSubmission extends Submission
             throw new IllegalStateException( "No resource has been localized" );
         }
 
-        return Store.asFilename( uuid );
+        return Store.getFilename( uuid );
     }
 
 

@@ -44,7 +44,7 @@ public class ValidationSession
     {
         assert Store.tmpFolder != null : "Store not initialized";
         this.uuid = uuid;
-        this.filename = Store.asFilename( uuid );
+        this.filename = Store.getFilename( uuid );
         this.commentary = reportFactory.create();
     }
 

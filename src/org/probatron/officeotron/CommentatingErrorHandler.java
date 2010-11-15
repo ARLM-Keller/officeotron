@@ -19,6 +19,8 @@
 
 package org.probatron.officeotron;
 
+import java.text.MessageFormat;
+
 import org.apache.log4j.Logger;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
@@ -31,10 +33,12 @@ public class CommentatingErrorHandler implements ErrorHandler
     private int instanceErrCount;
     public final static int THRESHOLD = 10;
 
+    private String fragmentName;
 
-    public CommentatingErrorHandler( ValidationReport commentary )
+    public CommentatingErrorHandler( ValidationReport commentary, String fragmentName )
     {
         this.commentary = commentary;
+        this.fragmentName = fragmentName;
     }
 
 
@@ -43,8 +47,8 @@ public class CommentatingErrorHandler implements ErrorHandler
         logger.trace( "Error: " + e.getMessage() );
         if( instanceErrCount < THRESHOLD )
         {
-            commentary.addComment( "ERROR", "(line " + e.getLineNumber() + ") "
-                    + e.getMessage() );
+        	String message = MessageFormat.format( "({0}:{1}) {2}", fragmentName, e.getLineNumber(), e.getMessage());
+            commentary.addComment( "ERROR", message );
         }
         commentary.incErrs();
         instanceErrCount++;

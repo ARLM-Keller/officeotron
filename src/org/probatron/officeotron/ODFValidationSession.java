@@ -140,7 +140,7 @@ public class ODFValidationSession extends ValidationSession
 
         // Create the Jing ValidationDriver
         PropertyMapBuilder builder = new PropertyMapBuilder();
-        CommentatingErrorHandler h = new CommentatingErrorHandler( getCommentary() );
+        CommentatingErrorHandler h = new CommentatingErrorHandler( getCommentary(), "META-INF/manifest.xml" );
         ValidateProperty.ERROR_HANDLER.put( builder, h );
         ValidationDriver driver = new ValidationDriver( builder.toPropertyMap() );
         InputStream candidateStream = null;
@@ -328,7 +328,8 @@ public class ODFValidationSession extends ValidationSession
         {
             // Create the Jing ValidationDriver
             PropertyMapBuilder builder = new PropertyMapBuilder();
-            CommentatingErrorHandler h = new CommentatingErrorHandler( commentary );
+            String[] segments = url.split("/");
+            CommentatingErrorHandler h = new CommentatingErrorHandler( commentary, segments[segments.length - 1] );
             ValidateProperty.ERROR_HANDLER.put( builder, h );
             ValidationDriver driver = new ValidationDriver( builder.toPropertyMap() );
 

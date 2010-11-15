@@ -47,8 +47,7 @@ public class OOXMLValidationSession extends ValidationSession
 
         if( errCount > 0 )
         {
-            getCommentary().addComment( "ERROR",
-                    "Grand total of errors in submitted package: " + errCount );
+            getCommentary().addComment( "Grand total of errors in submitted package: " + errCount );
         }
     }
 
@@ -181,7 +180,7 @@ public class OOXMLValidationSession extends ValidationSession
                 try
                 {
                     CommentatingErrorHandler h = new CommentatingErrorHandler( this
-                            .getCommentary() );
+                            .getCommentary(), t.getName() );
                     XMLReader parser = getConfiguredParser( osm, h );
 
                     String url = getUrlForEntry( t.getTargetAsPartName() ).toString();

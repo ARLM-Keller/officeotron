@@ -18,14 +18,13 @@
 
 package org.probatron.officeotron.sessionstorage;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.HashMap;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
@@ -37,34 +36,51 @@ public class Store
 
     static String tmpFolder;
     static String unzipInvocation;
+    static boolean webMode;
+    
+    static HashMap<UUID, String> localMap = new HashMap<UUID, String>();
 
 
-    public static void init( String tmpFolder, String unzipInvocation )
+    public static void init( String tmpFolder, String unzipInvocation, boolean webMode )
     {
         Store.tmpFolder = tmpFolder;
+        File tmp = new File( tmpFolder );
+        if ( !tmp.isDirectory() ) {
+        	tmp.mkdirs();
+        	tmp.mkdir();
+        }
+        
         Store.unzipInvocation = unzipInvocation;
+        Store.webMode = webMode;
     }
 
 
-    public static UUID putZippedResource( InputStream is ) throws IOException
+    public static UUID putZippedResource( InputStream is, String filename ) throws IOException
     {
 
         UUID uuid = UUID.randomUUID();
-        String fn = asFilename( uuid );
+        String fn = filename;
         new File( getDirectory( uuid ) ).mkdir();
         File cwd = new File( getDirectory( uuid ) );
 
-        long written = Utils.streamToFile( is, fn, false );
-
-        logger.debug( "Wrote " + written + " bytes to file" );
+        // Save the file locally only for web mode
+        if ( webMode ) {
+        	fn = getDirectory( uuid ) + File.separator + uuid + ".bin";
+	        long written = Utils.streamToFile( is, fn, false );
+	        logger.debug( "Wrote " + written + " bytes to file" );
+        }
+        
+        localMap.put( uuid, fn );
 
         // unzip it
-        String cmd = unzipInvocation + " -qq " + asFilename( uuid ) + " -d"
+        String cmd = unzipInvocation + " -qq " + fn + " -d"
                 + getDirectory( uuid );
         try
         {
 
             Process p = Runtime.getRuntime().exec( cmd, null, cwd );
+            p.getErrorStream();
+            
             int ret = p.waitFor();
             
             p.destroy();
@@ -80,46 +96,28 @@ public class Store
     }
 
 
-    static InputStream getStream( UUID uuid )
+    public static InputStream getStream( UUID uuid )
     {
-        String fn = asFilename( uuid );
-        File f = new File( fn );
+        String fn = localMap.get( uuid );
         InputStream is = null;
+        if ( fn != null ) {
+        	File f = new File( fn );
 
-        try
-        {
-            is = new FileInputStream( f );
-        }
-        catch( FileNotFoundException e )
-        {
-            // we'll return null in this case
+        	try
+        	{
+        		is = new FileInputStream( f );
+        	}
+        	catch( FileNotFoundException e )
+        	{
+        		// we'll return null in this case
+        	}
         }
 
         return is;
     }
 
 
-    static byte[] getBytes( UUID uuid )
-    {
-        byte[] ba = null;
-
-        try
-        {
-            String fn = asFilename( uuid );
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            Utils.streamFromFile( fn, baos, true );
-            ba = baos.toByteArray();
-        }
-        catch( IOException e )
-        {
-            // we'll return null in this case
-        }
-
-        return ba;
-    }
-
-
-    static URI urlForEntry( UUID uuid, String name )
+    public static URI urlForEntry( UUID uuid, String name )
     {
         String fn = getDirectory( uuid ) + File.separator + name;
         URI uri = new File( fn ).toURI();
@@ -127,28 +125,23 @@ public class Store
     }
 
 
-    static void delete( UUID uuid )
+    public static void delete( UUID uuid )
     {
         File dir = new File( getDirectory( uuid ) );
         Utils.deleteDir( dir );
+        localMap.remove( uuid );
     }
+    
 
-
-    static String asUrlRef( UUID uuid )
-    {
-        return "file:" + asFilename( uuid );
-    }
-
-
-    static String getDirectory( UUID uuid )
+    public static String getDirectory( UUID uuid )
     {
         return tmpFolder + File.separator + uuid;
     }
 
 
-    public static String asFilename( UUID uuid )
+    public static String getFilename( UUID uuid )
     {
-        return getDirectory( uuid ) + File.separator + uuid + ".bin";
+        return localMap.get( uuid );
     }
 
 }

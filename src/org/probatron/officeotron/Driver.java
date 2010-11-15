@@ -35,7 +35,7 @@ public class Driver
         String fn = args[ 0 ];
         logger.debug( "Command line request to validate file:"
                 + new File( fn ).getAbsolutePath() );
-        Store.init( System.getProperty( "java.io.tmpdir" ), "unzip" );
+        Store.init( System.getProperty( "java.io.tmpdir" ), "unzip", false );
 
         CommandLineSubmission cls = new CommandLineSubmission( fn );
 

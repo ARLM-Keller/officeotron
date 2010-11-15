@@ -20,9 +20,7 @@ package org.probatron.officeotron;
 
 import java.io.IOException;
 import java.util.Properties;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
-import java.util.concurrent.TimeUnit;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -75,7 +73,7 @@ public class ValidatorServlet extends HttpServlet
         }
 
         Store.init( sc.getInitParameter( "temp-folder" ), sc
-                .getInitParameter( "unzip-invocation" ) ); // to get the storage layer up and
+                .getInitParameter( "unzip-invocation" ), true ); // to get the storage layer up and
         // running
 
         if( !contentLengthOkay( req ) )

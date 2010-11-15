@@ -78,7 +78,7 @@ public class Store
         try
         {
 
-            Process p = Runtime.getRuntime().exec( cmd, null, cwd );
+            Process p = Runtime.getRuntime().exec( cmd );
             p.getErrorStream();
             
             int ret = p.waitFor();

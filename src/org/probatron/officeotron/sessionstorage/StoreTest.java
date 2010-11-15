@@ -63,6 +63,27 @@ public class StoreTest {
 			fail("shouldn't throw any exception");
 		}
 	}
+	
+	@Test
+	public void testPutZippedResourceRelativePath() {
+		Store.init( TMP_DIR, getUnzip(), false );
+		
+		try {
+			UUID uuid = Store.putZippedResource( new FileInputStream( TEST_FILE ), TEST_FILE.getPath() );
+			
+			File dir = new File( Store.getDirectory( uuid ) );
+			assertTrue( "No unzipped folder", dir.isDirectory() );
+			
+			File file = new File( dir, uuid.toString() );
+			assertFalse( "Unexpectedly cached file in " + file.getAbsolutePath(), file.isFile() );
+			
+			File containedFile = new File( dir, CONTAINED_FILE );
+			assertTrue( "File hasn't been uncompressed", containedFile.isFile() );
+			
+		} catch (Exception e) {
+			fail("shouldn't throw any exception");
+		}
+	}
 
 	
 	public String getUnzip() {

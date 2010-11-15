@@ -39,6 +39,8 @@ public class Driver
     	for ( int i = 0; i < args.length; i++ ) {
     		if ( args[i].equals("--errors-only") ) {
     			onlyErrors = true;
+    		} if ( args[i].equals("--help") ) {
+    			System.out.println( "arguments: [--errors-only] file1 ..." );
     		} else {
     			fns.add( args[i] );
     		}

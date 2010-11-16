@@ -35,13 +35,12 @@ public class Store
     static Logger logger = Logger.getLogger( Store.class );
 
     static String tmpFolder;
-    static String unzipInvocation;
     static boolean webMode;
     
     static HashMap<UUID, String> localMap = new HashMap<UUID, String>();
 
 
-    public static void init( String tmpFolder, String unzipInvocation, boolean webMode )
+    public static void init( String tmpFolder, boolean webMode )
     {
         Store.tmpFolder = tmpFolder;
         File tmp = new File( tmpFolder );
@@ -50,7 +49,6 @@ public class Store
         	tmp.mkdir();
         }
         
-        Store.unzipInvocation = unzipInvocation;
         Store.webMode = webMode;
     }
 
@@ -72,24 +70,7 @@ public class Store
         localMap.put( uuid, fn );
 
         // unzip it
-        String cmd = unzipInvocation + " -qq " + fn + " -d"
-                + getDirectory( uuid );
-        try
-        {
-
-            Process p = Runtime.getRuntime().exec( cmd );
-            p.getErrorStream();
-            
-            int ret = p.waitFor();
-            
-            p.destroy();
-            logger.debug( "Done cmd: " + cmd + ". return code=" + ret );
-
-        }
-        catch( Exception e )
-        {
-            logger.fatal( e.getMessage() );
-        }
+        Utils.unzipArchive( new File( fn ), new File( getDirectory( uuid ) ) );
 
         return uuid;
     }

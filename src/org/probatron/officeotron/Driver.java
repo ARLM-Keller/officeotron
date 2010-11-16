@@ -47,7 +47,7 @@ public class Driver
     	}
     	
     	final boolean showInfos = !onlyErrors; 
-        Store.init( System.getProperty( "java.io.tmpdir" ), "unzip", false );
+        Store.init( System.getProperty( "java.io.tmpdir" ), false );
 
         for (String fn : fns) {
         	logger.debug( "Validating file " + new File( fn ).getAbsolutePath() );

@@ -72,8 +72,7 @@ public class ValidatorServlet extends HttpServlet
             }
         }
 
-        Store.init( sc.getInitParameter( "temp-folder" ), sc
-                .getInitParameter( "unzip-invocation" ), true ); // to get the storage layer up and
+        Store.init( sc.getInitParameter( "temp-folder" ), true ); // to get the storage layer up and
         // running
 
         if( !contentLengthOkay( req ) )

@@ -34,12 +34,4 @@ public class CommandLineSubmission extends Submission
         	logger.error( "Can't access file: " + filename );
         }
     }
-
-
-    @Override
-    public String getCandidateFile()
-    {
-        return Store.getFilename( uuid );
-    }
-
 }

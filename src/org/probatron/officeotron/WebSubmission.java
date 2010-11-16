@@ -132,18 +132,6 @@ public class WebSubmission extends Submission
     }
 
 
-    @Override
-    public String getCandidateFile()
-    {
-        if( uuid == null )
-        {
-            throw new IllegalStateException( "No resource has been localized" );
-        }
-
-        return Store.getFilename( uuid );
-    }
-
-
     public String getResponseErr()
     {
         return responseErr;

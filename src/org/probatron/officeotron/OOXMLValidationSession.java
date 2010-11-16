@@ -19,11 +19,11 @@
 package org.probatron.officeotron;
 
 import java.io.IOException;
+import java.util.Set;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.probatron.officeotron.sessionstorage.ValidationSession;
-import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
@@ -32,6 +32,43 @@ public class OOXMLValidationSession extends ValidationSession
 {
     static Logger logger = Logger.getLogger( OOXMLValidationSession.class );
 
+    static XMLReader parser;
+    
+    static
+    {
+    	try
+    	{
+            System.setProperty("org.apache.xerces.xni.parser.XMLParserConfiguration", "org.apache.xerces.parsers.XMLGrammarCachingConfiguration");
+            
+            parser = XMLReaderFactory.createXMLReader();
+            parser.setFeature( "http://xml.org/sax/features/validation", true );
+            parser.setFeature( "http://apache.org/xml/features/validation/schema", true );
+
+            Set< String > types = OOXMLSchemaMap.getContentTypes();
+            String locations = new String();
+            for (String type : types)
+            {
+            	OOXMLSchemaMapping osm = OOXMLSchemaMap.getMappingForContentType( type );
+            	String schemaUrl = ClassLoader.getSystemResource( "schema/" + osm.getSchemaName() ).toString();
+            	
+            	if ( !osm.getNs().isEmpty() && !schemaUrl.isEmpty() )
+            	{
+	            	if (locations.length() > 0 )
+	            	{
+	            		locations += " ";
+	            	}
+	            	locations += osm.getNs() + " " + schemaUrl;
+            	}
+			}
+            parser.setProperty( "http://apache.org/xml/properties/schema/external-schemaLocation", locations );
+            
+            parser.setEntityResolver( new CachingEntityResolver() );
+    	}
+    	catch ( Exception e )
+    	{
+    		logger.error( "Couldn't create parser", e );
+    	}
+    }
 
     public OOXMLValidationSession( UUID uuid, ReportFactory reportFactory )
     {
@@ -181,11 +218,10 @@ public class OOXMLValidationSession extends ValidationSession
                 {
                     CommentatingErrorHandler h = new CommentatingErrorHandler( this
                             .getCommentary(), t.getName() );
-                    XMLReader parser = getConfiguredParser( osm, h );
+                    parser.setErrorHandler( h );
 
                     String url = getUrlForEntry( t.getTargetAsPartName() ).toString();
-                    logger
-                            .debug( "Validating: " + url + " using schema "
+                    logger.debug( "Validating: " + url + " using schema "
                                     + osm.getSchemaName() );
 
                     parser.parse( url );
@@ -205,8 +241,7 @@ public class OOXMLValidationSession extends ValidationSession
                     }
                     if( h.getInstanceErrCount() > CommentatingErrorHandler.THRESHOLD )
                     {
-                        getCommentary()
-                                .addComment(
+                        getCommentary().addComment(
                                         "(<i>"
                                                 + ( h.getInstanceErrCount() - CommentatingErrorHandler.THRESHOLD )
                                                 + " error(s) omitted for the sake of brevity</i>)" );
@@ -225,39 +260,5 @@ public class OOXMLValidationSession extends ValidationSession
 
             getCommentary().decIndent();
         }
-    }
-
-
-    XMLReader getConfiguredParser( OOXMLSchemaMapping osm, ErrorHandler h )
-    {
-        XMLReader parser = null;
-
-        try
-        {
-            parser = XMLReaderFactory.createXMLReader();
-            logger.debug( "Setting erorr handler " + h + " for parser " + parser + "; schema="
-                    + osm.getSchemaName() );
-
-            parser.setErrorHandler( h );
-
-            String schemaUrl = ClassLoader.getSystemResource( "schema/" + osm.getSchemaName() )
-                    .toString();
-            logger.debug( "Selecting XSD schema: " + schemaUrl );
-
-            parser.setFeature( "http://xml.org/sax/features/validation", true );
-            parser.setFeature( "http://apache.org/xml/features/validation/schema", true );
-            parser.setProperty(
-                    "http://apache.org/xml/properties/schema/external-schemaLocation", osm
-                            .getNs()
-                            + " " + schemaUrl );
-        }
-        catch( Exception e )
-        {
-            logger.error( "Exception configuring for schema " + osm.getSchemaName()
-                    + ": " + e + " " + e.getMessage() );
-        }
-
-        return parser;
-
     }
 }

@@ -23,7 +23,7 @@ public class StoreTest {
 
 	@Test
 	public void testPutZippedResourceWeb() {
-		Store.init( TMP_DIR, getUnzip(), true );
+		Store.init( TMP_DIR, true );
 		
 		try {
 			UUID uuid = Store.putZippedResource( new FileInputStream( TEST_FILE ), TEST_FILE.getAbsolutePath() );
@@ -45,7 +45,7 @@ public class StoreTest {
 	
 	@Test
 	public void testPutZippedResourceNoweb() {
-		Store.init( TMP_DIR, getUnzip(), false );
+		Store.init( TMP_DIR, false );
 		
 		try {
 			UUID uuid = Store.putZippedResource( new FileInputStream( TEST_FILE ), TEST_FILE.getAbsolutePath() );
@@ -66,7 +66,7 @@ public class StoreTest {
 	
 	@Test
 	public void testPutZippedResourceRelativePath() {
-		Store.init( TMP_DIR, getUnzip(), false );
+		Store.init( TMP_DIR, false );
 		
 		try {
 			UUID uuid = Store.putZippedResource( new FileInputStream( TEST_FILE ), TEST_FILE.getPath() );
@@ -83,14 +83,5 @@ public class StoreTest {
 		} catch (Exception e) {
 			fail("shouldn't throw any exception");
 		}
-	}
-
-	
-	public String getUnzip() {
-		String unzip = "unzip";
-		if ( File.separator.equals( "\\" ) ) {
-			unzip = "cmd /c unzip";
-		}
-		return unzip;
 	}
 }

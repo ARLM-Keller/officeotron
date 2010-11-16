@@ -20,6 +20,7 @@
 package org.probatron.officeotron;
 
 import java.util.HashMap;
+import java.util.Set;
 
 public class OOXMLSchemaMap
 {
@@ -31,12 +32,16 @@ public class OOXMLSchemaMap
         map.put( sm.getContentType(), sm );
     }
 
+    public static Set< String > getContentTypes( )
+    {
+    	return map.keySet();
+    }
 
     public static OOXMLSchemaMapping getMappingForContentType( String s )
     {
         return map.get( s );
     }
-
+    
     static
     {
         OOXMLSchemaMap.addMapping( new OOXMLSchemaMapping( "15.2.12.1",

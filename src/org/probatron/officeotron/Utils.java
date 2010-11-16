@@ -18,6 +18,8 @@
 
 package org.probatron.officeotron;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -27,9 +29,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Enumeration;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 import org.apache.log4j.Logger;
 import org.probatron.officeotron.sessionstorage.ValidationSession;
@@ -193,33 +197,20 @@ public class Utils
         String fn = new File( sub.getCandidateFile() ).toURI().toASCIIString();
         logger.debug( "auto-detecting package at: " + fn );
 
-        try
+        File manifest = sub.getEntryFile( "/META-INF/manifest.xml" );
+        if( manifest.canRead() )
         {
-
-            String url = "jar:" + fn + "!/META-INF/manifest.xml";
-            byte[] ba = Utils.derefUrl( new URL( url ) );
-            if( ba != null )
-            {
-                logger.info( "Auto detected ODF package" );
-                vs = new ODFValidationSession( sub.uuid, sub.getOptionMap(), reportFactory );
-            }
-            else
-            {
-                url = "jar:" + fn + "!/_rels/.rels";
-                ba = Utils.derefUrl( new URL( url ) );
-                if( ba != null )
-                {
-                    logger.info( "Auto detected OOXML package" );
-
-                    // we need to know where the OOXML schemas are
-
-                    vs = new OOXMLValidationSession( sub.uuid, reportFactory ); // FIXME
-                }
-            }
+            logger.info( "Auto detected ODF package" );
+            vs = new ODFValidationSession( sub.uuid, sub.getOptionMap(), reportFactory );
         }
-        catch( MalformedURLException e )
+        else
         {
-            logger.info( e.getMessage() );
+            File rels = sub.getEntryFile( "/_rels/.rels" );
+            if( rels.canRead() )
+            {
+                logger.info( "Auto detected OOXML package" );
+                vs = new OOXMLValidationSession( sub.uuid, reportFactory ); // FIXME
+            }
         }
 
         return vs;
@@ -291,6 +282,44 @@ public class Utils
             // do nothing
         }
     }
+
+    
+    public static void unzipArchive(File archive, File outputDir) {
+        try {
+            ZipFile zipfile = new ZipFile(archive);
+            for (Enumeration<? extends ZipEntry> e = zipfile.entries(); e.hasMoreElements(); ) {
+                ZipEntry entry = e.nextElement();
+                unzipEntry(zipfile, entry, outputDir);
+            }
+        } catch (Exception e) {
+            logger.error("Error while extracting file " + archive, e);
+        }
+    }
+
+    
+    private static void unzipEntry(ZipFile zipfile, ZipEntry entry, File outputDir) throws IOException {
+
+        if (entry.isDirectory()) {
+            new File(outputDir, entry.getName()).mkdirs();
+            return;
+        }
+
+        File outputFile = new File(outputDir, entry.getName());
+        if (!outputFile.getParentFile().exists()){
+            outputFile.getParentFile().mkdirs();
+        }
+
+        BufferedInputStream inputStream = new BufferedInputStream(zipfile.getInputStream(entry));
+        BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(outputFile));
+
+        try {
+            transferBytesToEndOfStream( inputStream, outputStream, CLOSE_NONE );
+        } finally {
+            outputStream.close();
+            inputStream.close();
+        }
+    }
+
 
 
     static public boolean deleteDir( File path )

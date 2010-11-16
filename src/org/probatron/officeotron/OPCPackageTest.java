@@ -56,7 +56,7 @@ public class OPCPackageTest extends TestCase
     protected void setUp() throws Exception
     {
         // special set-up for testing
-        Store.init( "c:\\officeotron", "cmd /c unzip", false );
+        Store.init( "c:\\officeotron", false );
 
         File f = new File( "etc/test-data/maria.xlsx" );
 

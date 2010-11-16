@@ -40,12 +40,6 @@
     <param-value>500000</param-value>
     <description>Max size of submissions</description>
   </context-param>
-  
-  <context-param>
-    <param-name>unzip-invocation</param-name>
-    <param-value>cmd /c unzip</param-value>
-    <description>How to invoke info-zip unzip executable on the command line</description>
-  </context-param>
 
   <servlet>
     <servlet-name>validator</servlet-name>

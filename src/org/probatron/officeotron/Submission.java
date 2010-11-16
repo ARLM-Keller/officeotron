@@ -17,9 +17,11 @@
  */
 
 package org.probatron.officeotron;
+import java.io.File;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
+import org.probatron.officeotron.sessionstorage.Store;
 
 /**
  * Represents the inputs to a validation session. This includes a resource to be validated
@@ -33,7 +35,25 @@ abstract public class Submission
     protected OptionMap optionMap = new OptionMap();
 
 
-    abstract public String getCandidateFile();
+    public String getCandidateFile()
+    {
+        if( uuid == null )
+        {
+            throw new IllegalStateException( "No resource has been localized" );
+        }
+
+        return Store.getFilename( uuid );
+    }
+    
+    public File getEntryFile( String entryName )
+    {
+    	if ( uuid == null )
+    	{
+    		throw new IllegalStateException( "No resource has been localized" );
+    	}
+    	
+    	return new File( Store.urlForEntry( uuid, entryName ) ); 
+    }
     
     public OptionMap getOptionMap()
     {

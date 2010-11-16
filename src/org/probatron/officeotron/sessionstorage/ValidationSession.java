@@ -133,8 +133,15 @@ public class ValidationSession
 
     public void cleanup()
     {
-        logger.info( "Performing cleanup" );
-        Store.delete( uuid );
+    	// Cleanup in a thread to potentially gain some more time
+    	new Thread( ) {
+    		@Override
+    		public void run() {
+    			logger.info( "Performing cleanup" );
+    	        Store.delete( uuid );
+    			super.run();
+    		}
+    	}.start();
     }
 
 

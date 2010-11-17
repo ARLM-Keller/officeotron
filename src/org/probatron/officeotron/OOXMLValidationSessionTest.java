@@ -35,7 +35,7 @@ import org.probatron.officeotron.sessionstorage.Store;
 public class OOXMLValidationSessionTest
 {
 	private static final File TEST_FILE = new File ( "etc/test-data/torture.pptx" );
-	private static final int EXPECTED_ERRORS = 2;
+	private static final int EXPECTED_ERRORS = 1;
 	
     OOXMLValidationSession ovs;
     UUID uuid;

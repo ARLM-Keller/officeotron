@@ -44,10 +44,14 @@ public class CommentatingErrorHandler implements ErrorHandler
 
     public void error( SAXParseException e ) throws SAXException
     {
-        logger.trace( "Error: " + e.getMessage() );
         if( instanceErrCount < THRESHOLD )
         {
-        	String message = MessageFormat.format( "({0}:{1}) {2}", fragmentName, e.getLineNumber(), e.getMessage());
+        	String name = fragmentName;
+        	
+        	// Use the systemId when the error is located in the schemas (unlikely to happen)
+        	if ( !e.getSystemId().endsWith(fragmentName) )
+        		name = e.getSystemId();
+        	String message = MessageFormat.format( "({0}:{1} col:{2}) {3}", name, e.getLineNumber(), e.getColumnNumber(), e.getMessage());
             commentary.addComment( "ERROR", message );
         }
         commentary.incErrs();

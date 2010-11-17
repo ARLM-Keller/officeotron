@@ -21,21 +21,35 @@ package org.probatron.officeotron;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.Properties;
+import java.util.UUID;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.*;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 import org.apache.log4j.PropertyConfigurator;
-import org.junit.Test;
 import org.probatron.officeotron.sessionstorage.Store;
-import org.probatron.officeotron.sessionstorage.ValidationSession;
 
-public class OPCPackageTest extends TestCase
+public class OPCPackageTest
 {
 
-    ValidationSession vs1, vs2;
-    OPCPackage opc, opc2;
+    private static final File TEST_FILE = new File ( "etc/test-data/torture.pptx" );
 
-    static
+    private static final int TARGETS_COUNT = 21;
+    
+	private static final String TARGET_OK_NAME = "/ppt/slides/slide1.xml";
+	private static final String TARGET_OK_TYPE = "http://schemas.openxmlformats.org/officeDocument/2006/relationships/slide";
+	private static final String TARGET_OK_MIMETYPE = "application/vnd.openxmlformats-officedocument.presentationml.slide+xml";
+	
+	private static final String TARGET_NOK_NAME = "/ppt/slides/slide999.xml";
+    
+    private OPCPackage opc;
+    private UUID uuid;
+
+    @BeforeClass
+    public static void classSetUp( )
     {
         // set up log message format, etc.
         String logLvl = System.getProperty( "property://probatron.org/officeotron-log-level" );
@@ -48,109 +62,57 @@ public class OPCPackageTest extends TestCase
         p.setProperty( "log4j.appender.A1.layout", "org.apache.log4j.PatternLayout" );
         p.setProperty( "log4j.appender.A1.layout.ConversionPattern", "%c %p - %m%n" );
         PropertyConfigurator.configure( p );
-
     }
 
 
-    @Override
-    protected void setUp() throws Exception
+    @Before
+    public void setUp() throws Exception
     {
-        // special set-up for testing
-        Store.init( "c:\\officeotron", false );
-
-        File f = new File( "etc/test-data/maria.xlsx" );
-
-        vs1 = new OOXMLValidationSession( null, new ReportFactory() {
-            public ValidationReport create()
-            {
-                return new StdioValidationReport( true );
-            }
-        } );
-
-        opc = new OPCPackage( vs1 );
+    	Store.init( System.getProperty( "java.io.tmpdir" ), false );
+    	uuid = Store.putZippedResource( new FileInputStream( TEST_FILE ), TEST_FILE.getPath() );
+    	opc = new OPCPackage( new File( Store.getDirectory( uuid ) ) );
         opc.process();
-
-        f = new File( "etc/test-data/torture.pptx" );
-        FileInputStream fis = new FileInputStream( f );
-        vs2 = new OOXMLValidationSession( null,
-
-        new ReportFactory() {
-            public ValidationReport create()
-            {
-                return new StdioValidationReport( true );
-            }
-        } );
-        opc2 = new OPCPackage( vs2 );
-        opc2.process();
-
-        super.setUp();
-
     }
 
 
-    @Override
-    protected void tearDown() throws Exception
+    @After
+    public void tearDown() throws Exception
     {
-        // Store.delete( vs1.getUuid() );
-        // Store.delete( vs2.getUuid() );
-        super.tearDown();
+    	Store.delete( uuid );
     }
 
 
     @Test
     public void test_targetCount()
     {
-        assertTrue( opc.getEntryCollection().size() == 10 );
-        assertTrue( opc2.getEntryCollection().size() == 10 );
-    }
-
-
-    @Test
-    public void test_entrySizeMatch()
-    {
-        assertTrue( opc.getEntryCollection().size() == opc.getEntryCollection()
-                .getPartNamesSet().size() );
-        assertTrue( opc2.getEntryCollection().size() == opc2.getEntryCollection()
-                .getPartNamesSet().size() );
+        assertEquals( TARGETS_COUNT, opc.getEntryCollection().size() );
     }
 
 
     @Test
     public void test_anEntry()
     {
-        OOXMLTarget t = opc.getEntryCollection().getTargetByName( "/xl/worksheets/sheet1.xml" );
-        assertTrue( t != null );
-        t = opc2.getEntryCollection().getTargetByName( "/ppt/slides/slide1.xml" );
-        assertTrue( t != null );
+        OOXMLTarget t = opc.getEntryCollection().getTargetByName( TARGET_OK_NAME );
+        assertNotNull( "Target should exist: " + TARGET_OK_NAME, t );
 
-        t = opc2.getEntryCollection().getTargetByName( "/ppt/slides/slide999.xml" );
-        assertFalse( t != null );
+        t = opc.getEntryCollection().getTargetByName( TARGET_NOK_NAME );
+        assertNull( "Target shouldn't exist: " + TARGET_NOK_NAME, t );
     }
 
 
     @Test
     public void test_entryType()
     {
-        OOXMLTarget t = opc.getEntryCollection().getTargetByName( "/xl/worksheets/sheet1.xml" );
-        assertTrue( t
-                .getType()
-                .equals(
-                        "http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" ) );
-        t = opc2.getEntryCollection().getTargetByName( "/ppt/slides/slide1.xml" );
-        assertTrue( t.getType().equals(
-                "http://schemas.openxmlformats.org/officeDocument/2006/relationships/slide" ) );
+        OOXMLTarget t = opc.getEntryCollection().getTargetByName( TARGET_OK_NAME );
+        assertEquals( TARGET_OK_TYPE, t.getType() );
     }
 
 
     @Test
     public void test_mimeType()
     {
-        OOXMLTarget t = opc.getEntryCollection().getTargetByName( "/xl/worksheets/sheet1.xml" );
-        assertTrue( t.getMimeType().equals(
-                "application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml" ) );
-        t = opc2.getEntryCollection().getTargetByName( "/ppt/slides/slide1.xml" );
-        assertTrue( t.getMimeType().equals(
-                "application/vnd.openxmlformats-officedocument.presentationml.slide+xml" ) );
+        OOXMLTarget t = opc.getEntryCollection().getTargetByName( TARGET_OK_NAME );
+        assertEquals( TARGET_OK_MIMETYPE, t.getMimeType() );
     }
 
 }

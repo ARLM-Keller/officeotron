@@ -20,7 +20,7 @@
 -->
 
 
-<project name="Office-o-tron" default="war" basedir=".">
+<project name="Office-o-tron" default="all" basedir=".">
 
 	<description>Office-o-tron Build</description>
 
@@ -32,6 +32,15 @@
 	<property name="etc" location="etc" />
 	<property name="lib" location="etc/lib" />
 
+	
+	<path id="all.dependencies">
+		<pathelement location="${lib}/servlet-api.jar" />
+		<pathelement location="${lib}/commons-fileupload-1.2.1.jar" />
+		<pathelement location="${lib}/log4j-1.2.15.jar" />
+		<pathelement location="${lib}/jing.jar" />
+		<pathelement location="${lib}/junit-4.6.jar" />
+		<pathelement location="${lib}/zipspy-0.1.0.jar" />
+	</path>
 
 	<target name="init">
 		<mkdir dir="${build}/classes" />
@@ -42,17 +51,30 @@
 		<!-- Compile the java code from ${src} into ${build} -->
 
 		<javac source="1.5" srcdir="${src}" destdir="${build}/classes">
-			<classpath>
-				<pathelement location="${lib}/servlet-api.jar" />
-				<pathelement location="${lib}/commons-fileupload-1.2.1.jar" />
-				<pathelement location="${lib}/log4j-1.2.15.jar" />
-				<pathelement location="${lib}/jing.jar" />
-				<pathelement location="${lib}/junit-4.6.jar" />
-				<pathelement location="${lib}/zipspy-0.1.0.jar" />
-			</classpath>
+			<classpath refid="all.dependencies"/>
 		</javac>
 	</target>
 
+	<target name="test" depends="compile" description="Runs the unit tests">
+		<mkdir dir="${dist}/tests"/>
+		
+		<junit printsummary="yes">
+			<classpath>
+				<path refid="all.dependencies"/>
+				<pathelement location="${build}/classes"/>
+				<pathelement location="${etc}"/> <!-- Needed for the schemas -->
+			</classpath>
+			
+			<formatter type="plain"/>
+			
+			<batchtest fork="yes" todir="${dist}/tests">
+				<fileset dir="${src}">
+			    	<include name="**/*Test.java"/>
+			    </fileset>
+			</batchtest>
+		</junit>
+	</target>
+	
 	<target name="jar" depends="compile" description="makes the Webapp JAR">
         <!-- Create the build directories -->
         <mkdir dir="${build}/lib" />
@@ -89,14 +111,8 @@
 		
 		<!-- copy the schema files -->
 		<copy todir="${dist}/temp/schema">
-			<fileset dir="${etc}/schema/29500T">
-				<include name="*.xsd"/>
-			</fileset>
-			<fileset dir="${etc}/schema/OPC">
-				<include name="*.xsd"/>
-			</fileset>
-			<fileset dir="${etc}/schema/others">
-				<include name="*.xsd"/>
+			<fileset dir="${etc}/schema">
+				<include name="**/*.xsd"/>
 			</fileset>
 		</copy>
 		
@@ -136,14 +152,8 @@
 
 		<!-- schemas -->
 		<copy todir="${dist}/WEB-INF/classes/schema">
-			<fileset dir="${etc}/schema/29500T">
-				<include name="*.xsd"/>
-			</fileset>
-			<fileset dir="${etc}/schema/OPC">
-				<include name="*.xsd"/>
-			</fileset>
-			<fileset dir="${etc}/schema/others">
-				<include name="*.xsd"/>
+			<fileset dir="${etc}/schema">
+				<include name="**/*.xsd"/>
 			</fileset>
 		</copy>
 
@@ -155,6 +165,9 @@
 		<war destfile="dist/officeotron-${version}.war" basedir="${dist}" webxml="${dist}/WEB-INF/web.xml" />
 	</target>
 
+	<target name="all" depends="war, application, test" description="Builds everything and run the tests">
+	</target>
+	
 	<target name="clean" description="clean up">
 		<delete dir="${build}" />
 		<delete dir="dist" />

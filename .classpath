@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="etc"/>
 	<classpathentry kind="lib" path="etc/lib/commons-fileupload-1.2.1.jar"/>
 	<classpathentry kind="lib" path="etc/lib/jing.jar"/>
 	<classpathentry kind="lib" path="etc/lib/junit-4.6.jar"/>

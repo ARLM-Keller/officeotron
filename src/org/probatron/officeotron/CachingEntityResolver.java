@@ -33,6 +33,8 @@ import org.xml.sax.SAXException;
 public class CachingEntityResolver implements EntityResolver
 {
 
+	private static final String OTHERS_SCHEMA = "others/";
+
 	public InputSource resolveEntity(String publicId, String systemId)
 			throws SAXException, IOException
 	{
@@ -41,15 +43,15 @@ public class CachingEntityResolver implements EntityResolver
 		
 		if ( systemId.equals( "http://dublincore.org/schemas/xmls/qdc/2003/04/02/dc.xsd" ) )
 		{
-			schemaPath = "dc.xsd";
+			schemaPath = OTHERS_SCHEMA + "dc.xsd";
 		}
 		else if ( systemId.equals( "http://dublincore.org/schemas/xmls/qdc/2003/04/02/dcterms.xsd" ) )
 		{
-			schemaPath = "dcterms.xsd";
+			schemaPath = OTHERS_SCHEMA + "dcterms.xsd";
 		}
 		else if ( systemId.endsWith( "dcmitype.xsd" ) )
 		{
-			schemaPath = "dcmitype.xsd";
+			schemaPath = OTHERS_SCHEMA + "dcmitype.xsd";
 		}
 		
 		if ( schemaPath != null )

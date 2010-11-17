@@ -18,11 +18,13 @@
 
 package org.probatron.officeotron;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Set;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
+import org.probatron.officeotron.sessionstorage.Store;
 import org.probatron.officeotron.sessionstorage.ValidationSession;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
@@ -78,7 +80,7 @@ public class OOXMLValidationSession extends ValidationSession
 
     public void validate()
     {
-        OPCPackage opc = new OPCPackage( this );
+        OPCPackage opc = new OPCPackage( new File( Store.getDirectory( getUuid() ) ) );
         opc.process();
         checkRelationships( opc );
 

@@ -18,60 +18,95 @@
 
 package org.probatron.officeotron;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.Properties;
+import java.util.UUID;
 
-import junit.framework.TestCase;
-
-import org.apache.log4j.PropertyConfigurator;
+import static org.junit.Assert.*;
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class OOXMLValidationSessionTest extends TestCase
+import org.apache.log4j.PropertyConfigurator;
+import org.probatron.officeotron.sessionstorage.Store;
+
+public class OOXMLValidationSessionTest
 {
-    OPCPackage opc, opc2;
-    OOXMLValidationSession ovs, ovs2;
+	private static final File TEST_FILE = new File ( "etc/test-data/torture.pptx" );
+	private static final int EXPECTED_ERRORS = 2;
+	
+    OOXMLValidationSession ovs;
+    UUID uuid;
 
-    static
+    @BeforeClass
+    public static void classSetUp( )
     {
-        // set up log message format, etc.
-        String logLvl = System.getProperty( "property://probatron.org/officeotron-log-level" );
-        logLvl = ( logLvl == null ) ? "TRACE" : logLvl;
+    	// set up log message format, etc.
+    	String logLvl = System.getProperty( "property://probatron.org/officeotron-log-level" );
+    	logLvl = ( logLvl == null ) ? "TRACE" : logLvl;
 
-        Properties p = new Properties();
-        p.setProperty( "log4j.rootCategory", logLvl + ", A1" );
-        p.setProperty( "log4j.appender.A1", "org.apache.log4j.ConsoleAppender" );
-        p.setProperty( "log4j.appender.A1.target", "System.err" );
-        p.setProperty( "log4j.appender.A1.layout", "org.apache.log4j.PatternLayout" );
-        p.setProperty( "log4j.appender.A1.layout.ConversionPattern", "%c %p - %m%n" );
-        PropertyConfigurator.configure( p );
+    	Properties p = new Properties();
+    	p.setProperty( "log4j.rootCategory", logLvl + ", A1" );
+    	p.setProperty( "log4j.appender.A1", "org.apache.log4j.ConsoleAppender" );
+    	p.setProperty( "log4j.appender.A1.target", "System.err" );
+    	p.setProperty( "log4j.appender.A1.layout", "org.apache.log4j.PatternLayout" );
+    	p.setProperty( "log4j.appender.A1.layout.ConversionPattern", "%c %p - %m%n" );
+    	PropertyConfigurator.configure( p );
     }
-
-// FIXME
-    @Override
-    protected void setUp() throws Exception
+    
+    @Before
+    public void setUp() throws Exception
     {
-    // TODO: mew test code
-    // opc = new OPCPackage( "file:etc/test-data/maria.xlsx" );
-    // ovs = new OOXMLValidationSession(
-    // new DummySubmission( "file:etc/test-data/maria.xlsx" ),
-    // "file:etc/schema/29500T/" );
-    //        
-    // opc2 = new OPCPackage( "file:etc/test-data/torture.pptx" );
-    // ovs2 = new OOXMLValidationSession(
-    // new DummySubmission( "file:etc/test-data/torture.pptx" ),
-    // "file:etc/schema/29500T/" );
+    	Store.init( System.getProperty( "java.io.tmpdir" ), false );
+    	uuid = Store.putZippedResource( new FileInputStream( TEST_FILE ), TEST_FILE.getPath() );
+        ovs = new OOXMLValidationSession( uuid, new ReportFactory() {
+			
+			public ValidationReport create() {
+				return new DummyValidationReport();
+			}
+		});
     }
 
 
     @Test
     public void test_packageIntegrity()
     {
-        opc.process();
-        opc2.process();
-        ovs.checkRelationships( opc );
-        assertTrue( ovs.getErrCount() == 2 );
-
-        ovs2.checkRelationships( opc2 );
-        assertTrue( ovs.getErrCount() == 2 );
+    	ovs.validate();
+    	assertEquals( "Invalid error number", EXPECTED_ERRORS, ovs.getErrCount() );
     }
+    
+    
+    /**
+     * Dummy validation report doing nothing only for the test purpose.
+     */
+    private class DummyValidationReport implements ValidationReport {
 
+		public void addComment(String s) {
+		}
+
+		public void addComment(String klass, String s) {
+		}
+
+		public void decIndent() {
+		}
+
+		public void endReport() {
+		}
+
+		public int getErrCount() {
+			return 0;
+		}
+
+		public void incErrs() {
+		}
+
+		public void incIndent() {
+		}
+
+		public void streamOut() throws IOException {
+		}
+    	
+    }
 }

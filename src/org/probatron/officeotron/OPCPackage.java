@@ -18,34 +18,34 @@
 
 package org.probatron.officeotron;
 
-import java.io.IOException;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
-import org.probatron.officeotron.sessionstorage.ValidationSession;
-import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
 
-public class OPCPackage extends AbstractPackage
+public class OPCPackage
 {
     static Logger logger = Logger.getLogger( OPCPackage.class );
     private OOXMLTargetCollection col = new OOXMLTargetCollection();
     private ArrayList< String > partsProbed = new ArrayList< String >();
     OOXMLDefaultTypeMap dtm = new OOXMLDefaultTypeMap();
 
+    
+    private File uncompressed;
 
-    public OPCPackage( ValidationSession vs )
+    public OPCPackage( File uncompressed )
     {
-        super( vs );
-        logger.trace( "Creating OPC package for submission: " + getSession().getUuid() );
+    	this.uncompressed = uncompressed;
     }
 
 
     public void process()
     {
-        procRels( "_rels/.rels" ); // kicks-off spidering process
+
+    	procRels( "_rels/.rels" ); // kicks-off spidering process
 
         // enrich with MIME type info from the Content Types
         try
@@ -54,18 +54,12 @@ public class OPCPackage extends AbstractPackage
             OOXMLContentTypeHandler h = new OOXMLContentTypeHandler( this.col, this.dtm );
             parser.setContentHandler( h );
 
-            String ctu = getSession().getUrlForEntry( "[Content_Types].xml" ).toString();
+            String ctu = new File( uncompressed, "[Content_Types].xml" ).toURI().toString();
             parser.parse( ctu );
         }
-        catch( SAXException e )
+        catch( Exception e )
         {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        catch( IOException e )
-        {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.fatal( "[Content_Types].xml parsing error", e);
         }
     }
 
@@ -80,9 +74,8 @@ public class OPCPackage extends AbstractPackage
     private void procRels( String entry )
     {
 
-        String partUrl = getSession().getUrlForEntry( entry ).toString();
-        logger.debug( "Retrieving relationship part from OPC package:" + partUrl + " (uuid = "
-                + getSession().getUuid() + ")" );
+        String partUrl = new File( uncompressed, entry ).getAbsolutePath();
+        logger.debug( "Retrieving relationship part from OPC package: " + partUrl );
 
         try
         {

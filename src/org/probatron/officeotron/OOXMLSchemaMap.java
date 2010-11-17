@@ -24,7 +24,10 @@ import java.util.Set;
 
 public class OOXMLSchemaMap
 {
-    private static HashMap< String, OOXMLSchemaMapping > map = new HashMap< String, OOXMLSchemaMapping >();
+    private static final String OPC_SCHEMA = "OPC/";
+	private static final String OOXML_SCHEMA = "29500T/";
+    
+	private static HashMap< String, OOXMLSchemaMapping > map = new HashMap< String, OOXMLSchemaMapping >();
 
 
     private static void addMapping( OOXMLSchemaMapping sm )
@@ -48,31 +51,31 @@ public class OOXMLSchemaMap
                 "application/vnd.openxmlformats-package.core-properties+xml",
                 "http://schemas.openxmlformats.org/package/2006/metadata/core-properties",
                 "http://schemas.openxmlformats.org/officedocument/2006/relationships/metadata/core-properties",
-                "opc-coreProperties.xsd" ) );
+                OPC_SCHEMA + "opc-coreProperties.xsd" ) );
         
         OOXMLSchemaMap.addMapping( new OOXMLSchemaMapping( "15.2.12.2",
                 "application/vnd.openxmlformats-officedocument.custom-properties+xml",
                 "http://schemas.openxmlformats.org/officeDocument/2006/custom-properties",
                 "http://schemas.openxmlformats.org/officeDocument/2006/relationships/custom-properties",
-                "shared-documentPropertiesCustom.xsd" ) );
+                OOXML_SCHEMA + "shared-documentPropertiesCustom.xsd" ) );
         
         OOXMLSchemaMap.addMapping( new OOXMLSchemaMapping( "15.2.12.3",
                 "application/vnd.openxmlformats-officedocument.extended-properties+xml",
                 "http://schemas.openxmlformats.org/officeDocument/2006/extended-properties",
                 "http://schemas.openxmlformats.org/officeDocument/2006/relationships/extended-properties",
-                "shared-documentPropertiesExtended.xsd" ) );
+                OOXML_SCHEMA + "shared-documentPropertiesExtended.xsd" ) );
 
         OOXMLSchemaMap.addMapping( new OOXMLSchemaMapping( "11.3.3",
                 "application/vnd.openxmlformats-officedocument.wordprocessingml.settings+xml",
                 "http://schemas.openxmlformats.org/wordprocessingml/2006/main",
                 "http://schemas.openxmlformats.org/officeDocument/2006/relationships/settings",
-                "wml.xsd" ) );
+                OOXML_SCHEMA + "wml.xsd" ) );
 
         OOXMLSchemaMap.addMapping( new OOXMLSchemaMapping( "11.3.4",
                 "application/vnd.openxmlformats-officedocument.wordprocessingml.endnotes+xml",
                 "http://schemas.openxmlformats.org/wordprocessingml/2006/main",
                 "http://schemas.openxmlformats.org/officeDocument/2006/relationships/endnotes",
-                "wml.xsd" ) );
+                OOXML_SCHEMA + "wml.xsd" ) );
 
         OOXMLSchemaMap
                 .addMapping( new OOXMLSchemaMapping(
@@ -80,13 +83,13 @@ public class OOXMLSchemaMap
                         "application/vnd.openxmlformats-officedocument.wordprocessingml.fontTable+xml",
                         "http://schemas.openxmlformats.org/wordprocessingml/2006/main",
                         "http://schemas.openxmlformats.org/officeDocument/2006/relationships/fontTable",
-                        "wml.xsd" ) );
+                        OOXML_SCHEMA + "wml.xsd" ) );
 
         OOXMLSchemaMap.addMapping( new OOXMLSchemaMapping( "11.3.6",
                 "application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml",
                 "http://schemas.openxmlformats.org/wordprocessingml/2006/main",
                 "http://schemas.openxmlformats.org/officeDocument/2006/relationships/footer",
-                "wml.xsd" ) );
+                OOXML_SCHEMA + "wml.xsd" ) );
 
         OOXMLSchemaMap
                 .addMapping( new OOXMLSchemaMapping(
@@ -94,7 +97,7 @@ public class OOXMLSchemaMap
                         "application/vnd.openxmlformats-officedocument.wordprocessingml.footnotes+xml",
                         "http://schemas.openxmlformats.org/wordprocessingml/2006/main",
                         "http://schemas.openxmlformats.org/officeDocument/2006/relationships/footnotes",
-                        "wml.xsd" ) );
+                        OOXML_SCHEMA + "wml.xsd" ) );
 
         OOXMLSchemaMap
                 .addMapping( new OOXMLSchemaMapping(
@@ -102,13 +105,13 @@ public class OOXMLSchemaMap
                         "application/vnd.openxmlformats-officedocument.wordprocessingml.document.glossary+xml",
                         "http://schemas.openxmlformats.org/wordprocessingml/2006/main",
                         "http://schemas.openxmlformats.org/officeDocument/2006/relationships/glossaryDocument",
-                        "wml.xsd" ) );
+                        OOXML_SCHEMA + "wml.xsd" ) );
 
         OOXMLSchemaMap.addMapping( new OOXMLSchemaMapping( "11.3.9",
                 "application/vnd.openxmlformats-officedocument.wordprocessingml.header+xml",
                 "http://schemas.openxmlformats.org/wordprocessingml/2006/main",
                 "http://schemas.openxmlformats.org/officeDocument/2006/relationships/header",
-                "wml.xsd" ) );
+                OOXML_SCHEMA + "wml.xsd" ) );
 
         OOXMLSchemaMap
                 .addMapping( new OOXMLSchemaMapping(
@@ -116,7 +119,7 @@ public class OOXMLSchemaMap
                         "application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml",
                         "http://schemas.openxmlformats.org/wordprocessingml/2006/main",
                         "http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument",
-                        "wml.xsd" ) );
+                        OOXML_SCHEMA + "wml.xsd" ) );
 
         OOXMLSchemaMap
                 .addMapping( new OOXMLSchemaMapping(
@@ -124,7 +127,7 @@ public class OOXMLSchemaMap
                         "application/vnd.openxmlformats-officedocument.wordprocessingml.template.main+xml",
                         "http://schemas.openxmlformats.org/wordprocessingml/2006/main",
                         "http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument",
-                        "wml.xsd" ) );
+                        OOXML_SCHEMA + "wml.xsd" ) );
 
         OOXMLSchemaMap
                 .addMapping( new OOXMLSchemaMapping(
@@ -132,13 +135,13 @@ public class OOXMLSchemaMap
                         "application/vnd.openxmlformats-officedocument.wordprocessingml.numbering+xml",
                         "http://schemas.openxmlformats.org/wordprocessingml/2006/main",
                         "http://schemas.openxmlformats.org/officeDocument/2006/relationships/numbering",
-                        "wml.xsd" ) );
+                        OOXML_SCHEMA + "wml.xsd" ) );
 
         OOXMLSchemaMap.addMapping( new OOXMLSchemaMapping( "11.3.12",
                 "application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml",
                 "http://schemas.openxmlformats.org/wordprocessingml/2006/main",
                 "http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles",
-                "wml.xsd" ) );
+                OOXML_SCHEMA + "wml.xsd" ) );
 
         OOXMLSchemaMap
                 .addMapping( new OOXMLSchemaMapping(
@@ -146,7 +149,7 @@ public class OOXMLSchemaMap
                         "application/vnd.openxmlformats-officedocument.wordprocessingml.webSettings+xml",
                         "http://schemas.openxmlformats.org/wordprocessingml/2006/main",
                         "http://schemas.openxmlformats.org/officeDocument/2006/relationships/webSettings",
-                        "wml.xsd" ) );
+                        OOXML_SCHEMA + "wml.xsd" ) );
 
         OOXMLSchemaMap
                 .addMapping( new OOXMLSchemaMapping(
@@ -154,7 +157,7 @@ public class OOXMLSchemaMap
                         "application/vnd.openxmlformats-officedocument.spreadsheetml.calcChain+xml",
                         "http://schemas.openxmlformats.org/spreadsheetml/2006/main",
                         "http://schemas.openxmlformats.org/officeDocument/2006/relationships/calcChain",
-                        "sml.xsd" ) );
+                        OOXML_SCHEMA + "sml.xsd" ) );
 
         OOXMLSchemaMap
                 .addMapping( new OOXMLSchemaMapping(
@@ -162,13 +165,13 @@ public class OOXMLSchemaMap
                         "application/vnd.openxmlformats-officedocument.spreadsheetml.chartsheet+xml",
                         "http://schemas.openxmlformats.org/spreadsheetml/2006/main",
                         "http://schemas.openxmlformats.org/officeDocument/2006/relationships/chartsheet",
-                        "sml.xsd" ) );
+                        OOXML_SCHEMA + "sml.xsd" ) );
 
         OOXMLSchemaMap.addMapping( new OOXMLSchemaMapping( "12.3.3",
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.comments+xml",
                 "http://schemas.openxmlformats.org/spreadsheetml/2006/main",
                 "http://schemas.openxmlformats.org/officeDocument/2006/relationships/comments",
-                "sml.xsd" ) );
+                OOXML_SCHEMA + "sml.xsd" ) );
 
         OOXMLSchemaMap
                 .addMapping( new OOXMLSchemaMapping(
@@ -176,7 +179,7 @@ public class OOXMLSchemaMap
                         "application/vnd.openxmlformats-officedocument.spreadsheetml.connections+xml",
                         "http://schemas.openxmlformats.org/spreadsheetml/2006/main",
                         "http://schemas.openxmlformats.org/officeDocument/2006/relationships/connections",
-                        "sml.xsd" ) );
+                        OOXML_SCHEMA + "sml.xsd" ) );
 
         OOXMLSchemaMap
                 .addMapping( new OOXMLSchemaMapping(
@@ -184,13 +187,13 @@ public class OOXMLSchemaMap
                         "application/vnd.openxmlformats-officedocument.spreadsheetml.dialogsheet+xml",
                         "http://schemas.openxmlformats.org/spreadsheetml/2006/main",
                         "http://schemas.openxmlformats.org/officeDocument/2006/relationships/dialogsheet",
-                        "sml.xsd" ) );
+                        OOXML_SCHEMA + "sml.xsd" ) );
 
         OOXMLSchemaMap.addMapping( new OOXMLSchemaMapping( "12.3.8",
                 "application/vnd.openxmlformats-officedocument.drawing+xml",
                 "http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing",
                 "http://schemas.openxmlformats.org/officeDocument/2006/relationships/drawing",
-                "dml-spreadsheetDrawing.xsd" ) );
+                OOXML_SCHEMA + "dml-spreadsheetDrawing.xsd" ) );
 
         OOXMLSchemaMap
                 .addMapping( new OOXMLSchemaMapping(
@@ -198,7 +201,7 @@ public class OOXMLSchemaMap
                         "application/vnd.openxmlformats-officedocument.spreadsheetml.externalLink+xml",
                         "http://schemas.openxmlformats.org/spreadsheetml/2006/main",
                         "http://schemas.openxmlformats.org/officeDocument/2006/relationships/externalLink",
-                        "sml.xsd" ) );
+                        OOXML_SCHEMA + "sml.xsd" ) );
 
         OOXMLSchemaMap
                 .addMapping( new OOXMLSchemaMapping(
@@ -206,7 +209,7 @@ public class OOXMLSchemaMap
                         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheetMetadata+xml",
                         "http://schemas.openxmlformats.org/spreadsheetml/2006/main",
                         "http://schemas.openxmlformats.org/officeDocument/2006/relationships/sheetMetadata",
-                        "sml.xsd" ) );
+                        OOXML_SCHEMA + "sml.xsd" ) );
 
         OOXMLSchemaMap
                 .addMapping( new OOXMLSchemaMapping(
@@ -214,7 +217,7 @@ public class OOXMLSchemaMap
                         "application/vnd.openxmlformats-officedocument.spreadsheetml.pivotTable+xml",
                         "http://schemas.openxmlformats.org/spreadsheetml/2006/main",
                         "http://schemas.openxmlformats.org/officeDocument/2006/relationships/pivotTable",
-                        "sml.xsd" ) );
+                        OOXML_SCHEMA + "sml.xsd" ) );
 
         OOXMLSchemaMap
                 .addMapping( new OOXMLSchemaMapping(
@@ -222,7 +225,7 @@ public class OOXMLSchemaMap
                         "application/vnd.openxmlformats-officedocument.spreadsheetml.pivotCacheDefinition+xml",
                         "http://schemas.openxmlformats.org/spreadsheetml/2006/main",
                         "http://schemas.openxmlformats.org/officeDocument/2006/relationships/pivotCacheDefinition",
-                        "sml.xsd" ) );
+                        OOXML_SCHEMA + "sml.xsd" ) );
 
         OOXMLSchemaMap
                 .addMapping( new OOXMLSchemaMapping(
@@ -230,7 +233,7 @@ public class OOXMLSchemaMap
                         "application/vnd.openxmlformats-officedocument.spreadsheetml.pivotCacheRecords+xml",
                         "http://schemas.openxmlformats.org/spreadsheetml/2006/main",
                         "http://schemas.openxmlformats.org/officeDocument/2006/relationships/pivotCacheRecords",
-                        "sml.xsd" ) );
+                        OOXML_SCHEMA + "sml.xsd" ) );
 
         OOXMLSchemaMap
                 .addMapping( new OOXMLSchemaMapping(
@@ -238,7 +241,7 @@ public class OOXMLSchemaMap
                         "application/vnd.openxmlformats-officedocument.spreadsheetml.queryTable+xml",
                         "http://schemas.openxmlformats.org/spreadsheetml/2006/main",
                         "http://schemas.openxmlformats.org/officeDocument/2006/relationships/queryTable",
-                        "sml.xsd" ) );
+                        OOXML_SCHEMA + "sml.xsd" ) );
 
         OOXMLSchemaMap
                 .addMapping( new OOXMLSchemaMapping(
@@ -246,7 +249,7 @@ public class OOXMLSchemaMap
                         "application/vnd.openxmlformats-officedocument.spreadsheetml.sharedStrings+xml",
                         "http://schemas.openxmlformats.org/spreadsheetml/2006/main",
                         "http://schemas.openxmlformats.org/officeDocument/2006/relationships/sharedStrings",
-                        "sml.xsd" ) );
+                        OOXML_SCHEMA + "sml.xsd" ) );
 
         OOXMLSchemaMap
                 .addMapping( new OOXMLSchemaMapping(
@@ -254,7 +257,7 @@ public class OOXMLSchemaMap
                         "application/vnd.openxmlformats-officedocument.spreadsheetml.revisionHeaders+xml",
                         "http://schemas.openxmlformats.org/spreadsheetml/2006/main",
                         "http://schemas.openxmlformats.org/officeDocument/2006/relationships/revisionHeaders",
-                        "sml.xsd" ) );
+                        OOXML_SCHEMA + "sml.xsd" ) );
 
         OOXMLSchemaMap
                 .addMapping( new OOXMLSchemaMapping(
@@ -262,7 +265,7 @@ public class OOXMLSchemaMap
                         "application/vnd.openxmlformats-officedocument.spreadsheetml.revisionLog+xml",
                         "http://schemas.openxmlformats.org/spreadsheetml/2006/main",
                         "http://schemas.openxmlformats.org/officeDocument/2006/relationships/revisionLog",
-                        "sml.xsd" ) );
+                        OOXML_SCHEMA + "sml.xsd" ) );
 
         OOXMLSchemaMap
                 .addMapping( new OOXMLSchemaMapping(
@@ -270,7 +273,7 @@ public class OOXMLSchemaMap
                         "application/vnd.openxmlformats-officedocument.spreadsheetml.userNames+xml",
                         "http://schemas.openxmlformats.org/spreadsheetml/2006/main",
                         "http://schemas.openxmlformats.org/officeDocument/2006/relationships/usernames",
-                        "sml.xsd" ) );
+                        OOXML_SCHEMA + "sml.xsd" ) );
 
         OOXMLSchemaMap
                 .addMapping( new OOXMLSchemaMapping(
@@ -278,19 +281,19 @@ public class OOXMLSchemaMap
                         "application/vnd.openxmlformats-officedocument.spreadsheetml.tableSingleCells+xml",
                         "http://schemas.openxmlformats.org/spreadsheetml/2006/main",
                         "http://schemas.openxmlformats.org/officeDocument/2006/relationships/tableSingleCells",
-                        "sml.xsd" ) );
+                        OOXML_SCHEMA + "sml.xsd" ) );
 
         OOXMLSchemaMap.addMapping( new OOXMLSchemaMapping( "12.3.20",
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml",
                 "http://schemas.openxmlformats.org/spreadsheetml/2006/main",
                 "http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles",
-                "sml.xsd" ) );
+                OOXML_SCHEMA + "sml.xsd" ) );
 
         OOXMLSchemaMap.addMapping( new OOXMLSchemaMapping( "12.3.21",
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.table+xml",
                 "http://schemas.openxmlformats.org/spreadsheetml/2006/main",
                 "http://schemas.openxmlformats.org/officeDocument/2006/relationships/table",
-                "sml.xsd" ) );
+                OOXML_SCHEMA + "sml.xsd" ) );
 
         OOXMLSchemaMap
                 .addMapping( new OOXMLSchemaMapping(
@@ -298,7 +301,7 @@ public class OOXMLSchemaMap
                         "application/vnd.openxmlformats-officedocument.spreadsheetml.volatileDependencies+xml",
                         "http://schemas.openxmlformats.org/spreadsheetml/2006/main",
                         "http://schemas.openxmlformats.org/officeDocument/2006/relationships/volatileDependencies",
-                        "sml.xsd" ) );
+                        OOXML_SCHEMA + "sml.xsd" ) );
 
         OOXMLSchemaMap
                 .addMapping( new OOXMLSchemaMapping(
@@ -306,7 +309,7 @@ public class OOXMLSchemaMap
                         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml",
                         "http://schemas.openxmlformats.org/spreadsheetml/2006/main",
                         "http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument",
-                        "sml.xsd" ) );
+                        OOXML_SCHEMA + "sml.xsd" ) );
 
         OOXMLSchemaMap
                 .addMapping( new OOXMLSchemaMapping(
@@ -314,7 +317,7 @@ public class OOXMLSchemaMap
                         "application/vnd.openxmlformats-officedocument.spreadsheetml.template.main+xml",
                         "http://schemas.openxmlformats.org/spreadsheetml/2006/main",
                         "http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument",
-                        "sml.xsd" ) );
+                        OOXML_SCHEMA + "sml.xsd" ) );
 
         OOXMLSchemaMap
                 .addMapping( new OOXMLSchemaMapping(
@@ -322,7 +325,7 @@ public class OOXMLSchemaMap
                         "application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml",
                         "http://schemas.openxmlformats.org/spreadsheetml/2006/main",
                         "http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet",
-                        "sml.xsd" ) );
+                        OOXML_SCHEMA + "sml.xsd" ) );
 
         OOXMLSchemaMap
                 .addMapping( new OOXMLSchemaMapping(
@@ -330,13 +333,13 @@ public class OOXMLSchemaMap
                         "application/vnd.openxmlformats-officedocument.presentationml.commentAuthors+xml",
                         "http://schemas.openxmlformats.org/presentationml/2006/main",
                         "http://schemas.openxmlformats.org/officeDocument/2006/relationships/commentAuthors",
-                        "pml.xsd" ) );
+                        OOXML_SCHEMA + "pml.xsd" ) );
 
         OOXMLSchemaMap.addMapping( new OOXMLSchemaMapping( "13.3.2",
                 "application/vnd.openxmlformats-officedocument.presentationml.comments+xml",
                 "http://schemas.openxmlformats.org/presentationml/2006/main",
                 "http://schemas.openxmlformats.org/officeDocument/2006/relationships/comments",
-                "pml.xsd" ) );
+                OOXML_SCHEMA + "pml.xsd" ) );
 
         OOXMLSchemaMap
                 .addMapping( new OOXMLSchemaMapping(
@@ -344,7 +347,7 @@ public class OOXMLSchemaMap
                         "application/vnd.openxmlformats-officedocument.presentationml.handoutMaster+xml",
                         "http://schemas.openxmlformats.org/presentationml/2006/main",
                         "http://schemas.openxmlformats.org/officeDocument/2006/relationships/handoutMaster",
-                        "pml.xsd" ) );
+                        OOXML_SCHEMA + "pml.xsd" ) );
 
         OOXMLSchemaMap
                 .addMapping( new OOXMLSchemaMapping(
@@ -352,7 +355,7 @@ public class OOXMLSchemaMap
                         "application/vnd.openxmlformats-officedocument.presentationml.notesMaster+xml",
                         "http://schemas.openxmlformats.org/presentationml/2006/main",
                         "http://schemas.openxmlformats.org/officeDocument/2006/relationships/notesMaster",
-                        "pml.xsd" ) );
+                        OOXML_SCHEMA + "pml.xsd" ) );
 
         OOXMLSchemaMap
                 .addMapping( new OOXMLSchemaMapping(
@@ -360,7 +363,7 @@ public class OOXMLSchemaMap
                         "application/vnd.openxmlformats-officedocument.presentationml.notesSlide+xml",
                         "http://schemas.openxmlformats.org/presentationml/2006/main",
                         "http://schemas.openxmlformats.org/officeDocument/2006/relationships/notesSlide",
-                        "pml.xsd" ) );
+                        OOXML_SCHEMA + "pml.xsd" ) );
 
         OOXMLSchemaMap
                 .addMapping( new OOXMLSchemaMapping(
@@ -368,7 +371,7 @@ public class OOXMLSchemaMap
                         "application/vnd.openxmlformats-officedocument.presentationml.presentation.main+xml",
                         "http://schemas.openxmlformats.org/presentationml/2006/main",
                         "http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument",
-                        "pml.xsd" ) );
+                        OOXML_SCHEMA + "pml.xsd" ) );
 
         OOXMLSchemaMap
                 .addMapping( new OOXMLSchemaMapping(
@@ -376,7 +379,7 @@ public class OOXMLSchemaMap
                         "application/vnd.openxmlformats-officedocument.presentationml.sildeshow.main+xml",
                         "http://schemas.openxmlformats.org/presentationml/2006/main",
                         "http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument",
-                        "pml.xsd" ) );
+                        OOXML_SCHEMA + "pml.xsd" ) );
 
         OOXMLSchemaMap
                 .addMapping( new OOXMLSchemaMapping(
@@ -384,7 +387,7 @@ public class OOXMLSchemaMap
                         "application/vnd.openxmlformats-officedocument.presentationml.template.main+xml",
                         "http://schemas.openxmlformats.org/presentationml/2006/main",
                         "http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument",
-                        "pml.xsd" ) );
+                        OOXML_SCHEMA + "pml.xsd" ) );
 
         OOXMLSchemaMap
                 .addMapping( new OOXMLSchemaMapping(
@@ -392,13 +395,13 @@ public class OOXMLSchemaMap
                         "application/vnd.openxmlformats-officedocument.presentationml.presProps+xml",
                         "http://schemas.openxmlformats.org/presentationml/2006/main",
                         "http://schemas.openxmlformats.org/officeDocument/2006/relationships/presProps",
-                        "pml.xsd" ) );
+                        OOXML_SCHEMA + "pml.xsd" ) );
 
         OOXMLSchemaMap.addMapping( new OOXMLSchemaMapping( "13.3.8",
                 "application/vnd.openxmlformats-officedocument.presentationml.slide+xml",
                 "http://schemas.openxmlformats.org/presentationml/2006/main",
                 "http://schemas.openxmlformats.org/officeDocument/2006/relationships/slide",
-                "pml.xsd" ) );
+                OOXML_SCHEMA + "pml.xsd" ) );
 
         OOXMLSchemaMap
                 .addMapping( new OOXMLSchemaMapping(
@@ -406,7 +409,7 @@ public class OOXMLSchemaMap
                         "application/vnd.openxmlformats-officedocument.presentationml.slideLayout+xml",
                         "http://schemas.openxmlformats.org/presentationml/2006/main",
                         "http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideLayout",
-                        "pml.xsd" ) );
+                        OOXML_SCHEMA + "pml.xsd" ) );
 
         OOXMLSchemaMap
                 .addMapping( new OOXMLSchemaMapping(
@@ -414,13 +417,13 @@ public class OOXMLSchemaMap
                         "application/vnd.openxmlformats-officedocument.presentationml.slideMaster+xml",
                         "http://schemas.openxmlformats.org/presentationml/2006/main",
                         "http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideMaster",
-                        "pml.xsd" ) );
+                        OOXML_SCHEMA + "pml.xsd" ) );
 
         OOXMLSchemaMap.addMapping( new OOXMLSchemaMapping( "13.3.11",
                 "application/vnd.openxmlformats-officedocument.presentationml.tags+xml",
                 "http://schemas.openxmlformats.org/presentationml/2006/main",
                 "http://schemas.openxmlformats.org/officeDocument/2006/relationships/tags",
-                "pml.xsd" ) );
+                OOXML_SCHEMA + "pml.xsd" ) );
 
         OOXMLSchemaMap
                 .addMapping( new OOXMLSchemaMapping(
@@ -428,13 +431,13 @@ public class OOXMLSchemaMap
                         "application/vnd.openxmlformats-officedocument.presentationml.viewProps+xml",
                         "http://schemas.openxmlformats.org/presentationml/2006/main",
                         "http://schemas.openxmlformats.org/officeDocument/2006/relationships/viewProps",
-                        "pml.xsd" ) );
+                        OOXML_SCHEMA + "pml.xsd" ) );
 
         OOXMLSchemaMap.addMapping( new OOXMLSchemaMapping( "14.2.1",
                 "application/vnd.openxmlformats-officedocument.drawingml.chart+xml",
                 "http://schemas.openxmlformats.org/drawingml/2006/chart",
                 "http://schemas.openxmlformats.org/officeDocument/2006/relationships/chart",
-                "dml-chart.xsd" ) );
+                OOXML_SCHEMA + "dml-chart.xsd" ) );
 
         OOXMLSchemaMap
                 .addMapping( new OOXMLSchemaMapping(
@@ -442,7 +445,7 @@ public class OOXMLSchemaMap
                         "application/vnd.openxmlformats-officedocument.drawingml.chartshapes+xml",
                         "http://schemas.openxmlformats.org/drawingml/2006/chart",
                         "http://schemas.openxmlformats.org/officeDocument/2006/relationships/chartUserShapes",
-                        "dml-main.xsd" ) );
+                        OOXML_SCHEMA + "dml-main.xsd" ) );
 
         OOXMLSchemaMap
                 .addMapping( new OOXMLSchemaMapping(
@@ -450,7 +453,7 @@ public class OOXMLSchemaMap
                         "application/vnd.openxmlformats-officedocument.drawingml.diagramColors+xml",
                         "http://schemas.openxmlformats.org/drawingml/2006/diagram",
                         "http://schemas.openxmlformats.org/officeDocument/2006/relationships/diagramColors",
-                        "dml-main.xsd" ) );
+                        OOXML_SCHEMA + "dml-main.xsd" ) );
 
         OOXMLSchemaMap
                 .addMapping( new OOXMLSchemaMapping(
@@ -458,7 +461,7 @@ public class OOXMLSchemaMap
                         "application/vnd.openxmlformats-officedocument.drawingml.diagramData+xml",
                         "http://schemas.openxmlformats.org/drawingml/2006/diagram",
                         "http://schemas.openxmlformats.org/officeDocument/2006/relationships/diagramData",
-                        "dml-main.xsd" ) );
+                        OOXML_SCHEMA + "dml-main.xsd" ) );
 
         OOXMLSchemaMap
                 .addMapping( new OOXMLSchemaMapping(
@@ -466,7 +469,7 @@ public class OOXMLSchemaMap
                         "application/vnd.openxmlformats-officedocument.drawingml.diagramLayout+xml",
                         "http://schemas.openxmlformats.org/drawingml/2006/diagram",
                         "http://schemas.openxmlformats.org/officeDocument/2006/relationships/diagramLayout",
-                        "dml-diagram.xsd" ) );
+                        OOXML_SCHEMA + "dml-diagram.xsd" ) );
 
         OOXMLSchemaMap
                 .addMapping( new OOXMLSchemaMapping(
@@ -474,13 +477,13 @@ public class OOXMLSchemaMap
                         "application/vnd.openxmlformats-officedocument.drawingml.diagramStyle+xml",
                         "http://schemas.openxmlformats.org/drawingml/2006/diagram",
                         "http://schemas.openxmlformats.org/officeDocument/2006/relationships/diagramQuickStyle",
-                        "dml-diagram.xsd" ) );
+                        OOXML_SCHEMA + "dml-diagram.xsd" ) );
 
         OOXMLSchemaMap.addMapping( new OOXMLSchemaMapping( "14.2.7",
                 "application/vnd.openxmlformats-officedocument.theme+xml",
                 "http://schemas.openxmlformats.org/drawingml/2006/main",
                 "http://schemas.openxmlformats.org/officeDocument/2006/relationships/theme",
-                "dml-main.xsd" ) );
+                OOXML_SCHEMA + "dml-main.xsd" ) );
 
         OOXMLSchemaMap
                 .addMapping( new OOXMLSchemaMapping(
@@ -488,7 +491,7 @@ public class OOXMLSchemaMap
                         "application/vnd.openxmlformats-officedocument.themeOverride+xml",
                         "http://schemas.openxmlformats.org/drawingml/2006/chart",
                         "http://schemas.openxmlformats.org/officeDocument/2006/relationships/themeOverride",
-                        "dml-main.xsd" ) );
+                        OOXML_SCHEMA + "dml-main.xsd" ) );
 
         OOXMLSchemaMap
                 .addMapping( new OOXMLSchemaMapping(
@@ -496,7 +499,7 @@ public class OOXMLSchemaMap
                         "application/vnd.openxmlformats-officedocument.presentationml.tableStyles+xml",
                         "http://schemas.openxmlformats.org/drawingml/2006/main",
                         "http://schemas.openxmlformats.org/officeDocument/2006/relationships/tableStyles",
-                        "dml-main.xsd" ) );
+                        OOXML_SCHEMA + "dml-main.xsd" ) );
 
         OOXMLSchemaMap
                 .addMapping( new OOXMLSchemaMapping(
@@ -512,7 +515,7 @@ public class OOXMLSchemaMap
                 "application/vnd.openxmlformats-officedocument.vmlDrawing",
                 "",
                 "http://schemas.openxmlformats.org/officeDocument/2006/relationships/vmlDrawing",
-                "vml-main.xsd" ) );
+                OOXML_SCHEMA + "vml-main.xsd" ) );
         
         // http://schemas.openxmlformats.org/officeDocument/2006/relationships/vmlDrawing
         // http://schemas.openxmlformats.org/officeDocument/2006/relationships/vmlDrawing

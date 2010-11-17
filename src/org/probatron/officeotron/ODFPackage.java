@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
-import org.probatron.officeotron.sessionstorage.ValidationSession;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.Locator;
@@ -30,17 +29,15 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
 
-public class ODFPackage extends AbstractPackage implements ContentHandler
+public class ODFPackage implements ContentHandler
 {
     static Logger logger = Logger.getLogger( ODFPackage.class );
     private final static String ODF_MANIFEST_NS = "urn:oasis:names:tc:opendocument:xmlns:manifest:1.0";
     private ArrayList< String > itemRefs = new ArrayList< String >();
     private ArrayList< String > itemTypes = new ArrayList< String >();
 
-
-    public ODFPackage( ValidationSession vs )
+    public ODFPackage( )
     {
-        super( vs );
     }
 
 

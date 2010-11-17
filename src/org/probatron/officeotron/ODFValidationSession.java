@@ -190,7 +190,7 @@ public class ODFValidationSession extends ValidationSession
     {
         String manifestUrl = getUrlForEntry( "META-INF/manifest.xml" ).toString();
 
-        ODFPackage mft = new ODFPackage( this );
+        ODFPackage mft = new ODFPackage( );
         mft.process( manifestUrl );
         return mft;
     }

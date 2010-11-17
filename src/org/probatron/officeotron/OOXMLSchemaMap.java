@@ -64,6 +64,12 @@ public class OOXMLSchemaMap
                 "http://schemas.openxmlformats.org/officeDocument/2006/extended-properties",
                 "http://schemas.openxmlformats.org/officeDocument/2006/relationships/extended-properties",
                 OOXML_SCHEMA + "shared-documentPropertiesExtended.xsd" ) );
+      
+        OOXMLSchemaMap.addMapping( new OOXMLSchemaMapping( "11.3.2",
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.comments+xml",
+                "http://schemas.openxmlformats.org/wordprocessingml/2006/main",
+                "http://schemas.openxmlformats.org/officeDocument/2006/relationships/comments",
+                OOXML_SCHEMA + "wml.xsd" ) );
 
         OOXMLSchemaMap.addMapping( new OOXMLSchemaMapping( "11.3.3",
                 "application/vnd.openxmlformats-officedocument.wordprocessingml.settings+xml",

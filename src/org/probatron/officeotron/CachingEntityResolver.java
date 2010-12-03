@@ -53,6 +53,18 @@ public class CachingEntityResolver implements EntityResolver
 		{
 			schemaPath = OTHERS_SCHEMA + "dcmitype.xsd";
 		}
+		else if ( systemId.endsWith( "xml.xsd" ) )
+		{
+			schemaPath = OTHERS_SCHEMA + "xml.xsd";
+		}
+		else if ( systemId.endsWith( "XMLSchema.dtd" ) )
+		{
+			schemaPath = OTHERS_SCHEMA + "XMLSchema.dtd";
+		}
+		else if ( systemId.endsWith( "datatypes.dtd" ) )
+		{
+			schemaPath = OTHERS_SCHEMA + "datatypes.dtd";
+		}
 		
 		if ( schemaPath != null )
 		{

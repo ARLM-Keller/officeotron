@@ -113,6 +113,7 @@
 		<copy todir="${dist}/temp/schema">
 			<fileset dir="${etc}/schema">
 				<include name="**/*.xsd"/>
+				<include name="**/*.dtd"/>
 			</fileset>
 		</copy>
 		
@@ -154,6 +155,7 @@
 		<copy todir="${dist}/WEB-INF/classes/schema">
 			<fileset dir="${etc}/schema">
 				<include name="**/*.xsd"/>
+				<include name="**/*.dtd"/>
 			</fileset>
 		</copy>
 

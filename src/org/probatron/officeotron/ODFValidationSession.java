@@ -64,15 +64,15 @@ public class ODFValidationSession extends ValidationSession
         {
             schema10 = Utils
                     .derefUrl( new URL(
-                            "http://docs.oasis-open.org/office/v1.2/cd05/OpenDocument-v1.2-cd05-schema.rng" ) );
+                            "http://www.oasis-open.org/committees/download.php/12571/OpenDocument-schema-v1.0-os.rng" ) );
             schema11 = Utils.derefUrl( new URL(
                     "http://docs.oasis-open.org/office/v1.1/OS/OpenDocument-schema-v1.1.rng" ) );
             schema12 = Utils
                     .derefUrl( new URL(
-                            "http://docs.oasis-open.org/office/v1.2/part1/cd04/OpenDocument-schema-v1.2-cd04.rng" ) );
+                            "http://docs.oasis-open.org/office/v1.2/csprd03/OpenDocument-v1.2-csprd03-schema.rng" ) );
             manifest12 = Utils
                     .derefUrl( new URL(
-                            "http://docs.oasis-open.org/office/v1.2/cd05/OpenDocument-v1.2-cd05-manifest-schema.rng" ) );
+                            "http://docs.oasis-open.org/office/v1.2/csprd03/OpenDocument-v1.2-csprd03-manifest-schema.rng" ) );
         }
         catch( MalformedURLException e )
         {

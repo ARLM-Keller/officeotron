@@ -75,6 +75,7 @@ public class WebTask implements Runnable
                 e.printStackTrace();
             }
 
+            vs.cleanup();
             return;
         }
 

@@ -3,7 +3,7 @@
  * 
  * Office-o-tron - a web-based office document validator for Java(tm)
  * 
- * Copyright (c) 2010 Novell Inc.
+ * Copyright (c) 2010-2011 Novell Inc.
  * 
  * All rights reserved world-wide.
  * 
@@ -15,53 +15,59 @@
  * OF ANY KIND, either express or implied. See the License for the specific language governing
  * rights and limitations under the License.
  */
-package org.probatron.officeotron;
+package org.probatron.officeotron.utils;
 
 import java.io.IOException;
 import java.net.URL;
 
-import org.xml.sax.EntityResolver;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
+import org.w3c.dom.ls.LSInput;
+import org.w3c.dom.ls.LSResourceResolver;
 
 /**
  * Entity resolver caching the downloaded files.
  * 
- * @author Cedric Bosdonnat <cbosdonnat@novell.com>
+ * @author Cedric Bosdonnat <cbosdonnat@suse.com>
  *
  */
-public class CachingEntityResolver implements EntityResolver
+public class CachingResourceResolver implements LSResourceResolver
 {
-
 	private static final String OTHERS_SCHEMA = "others/";
 
-	public InputSource resolveEntity(String publicId, String systemId)
-			throws SAXException, IOException
+	public LSInput resolveResource(String type, String namespaceURI,
+			String publicId, String systemId, String baseURI)
 	{
-		InputSource src = null;
+		LSInput src = null;
 		String schemaPath = null;
 		
-		if ( systemId.equals( "http://dublincore.org/schemas/xmls/qdc/2003/04/02/dc.xsd" ) )
+		if ( "http://dublincore.org/schemas/xmls/qdc/2003/04/02/dc.xsd".equals( systemId ) )
 		{
 			schemaPath = OTHERS_SCHEMA + "dc.xsd";
 		}
-		else if ( systemId.equals( "http://dublincore.org/schemas/xmls/qdc/2003/04/02/dcterms.xsd" ) )
+		else if ( "http://dublincore.org/schemas/xmls/qdc/2003/04/02/dcterms.xsd".equals( systemId ) )
 		{
 			schemaPath = OTHERS_SCHEMA + "dcterms.xsd";
 		}
-		else if ( systemId.endsWith( "dcmitype.xsd" ) )
+		else if ( "dcmitype.xsd".equals(systemId) )
 		{
 			schemaPath = OTHERS_SCHEMA + "dcmitype.xsd";
 		}
-		else if ( systemId.endsWith( "xml.xsd" ) )
+		else if ( "http://www.w3.org/2001/xml.xsd".equals( systemId ) )
 		{
 			schemaPath = OTHERS_SCHEMA + "xml.xsd";
 		}
-		else if ( systemId.endsWith( "XMLSchema.dtd" ) )
+		else if ( "http://dublincore.org/schemas/xmls/qdc/2003/04/02/dc.xsd".equals( systemId ) )
+		{
+			schemaPath = OTHERS_SCHEMA + "dc.xsd";
+		}
+		else if ( "http://dublincore.org/schemas/xmls/qdc/2003/04/02/dcterms.xsd".equals( systemId ) )
+		{
+			schemaPath = OTHERS_SCHEMA + "dcterms.xsd";
+		}
+		else if ( "XMLSchema.dtd".equals( systemId ) )
 		{
 			schemaPath = OTHERS_SCHEMA + "XMLSchema.dtd";
 		}
-		else if ( systemId.endsWith( "datatypes.dtd" ) )
+		else if ( "datatypes.dtd".equals( systemId ) )
 		{
 			schemaPath = OTHERS_SCHEMA + "datatypes.dtd";
 		}
@@ -69,7 +75,12 @@ public class CachingEntityResolver implements EntityResolver
 		if ( schemaPath != null )
 		{
 			URL schema = ClassLoader.getSystemResource( "schema/" + schemaPath );
-			src = new InputSource( schema.openStream() );
+			src = new LSInputAdapter( );
+			try {
+				src.setByteStream( schema.openStream() );
+			} catch (IOException e) {
+				src = null;
+			}
 		}
 		
 		return src;

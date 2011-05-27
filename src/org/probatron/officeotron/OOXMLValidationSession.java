@@ -20,12 +20,23 @@ package org.probatron.officeotron;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Set;
 import java.util.UUID;
+
+import javax.xml.XMLConstants;
+import javax.xml.transform.Source;
+import javax.xml.transform.sax.SAXSource;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
+import javax.xml.validation.Validator;
 
 import org.apache.log4j.Logger;
 import org.probatron.officeotron.sessionstorage.Store;
 import org.probatron.officeotron.sessionstorage.ValidationSession;
+import org.probatron.officeotron.utils.CachingResourceResolver;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
@@ -35,6 +46,7 @@ public class OOXMLValidationSession extends ValidationSession
     static Logger logger = Logger.getLogger( OOXMLValidationSession.class );
 
     static XMLReader parser;
+	static Validator validator;
     
     static
     {
@@ -42,29 +54,32 @@ public class OOXMLValidationSession extends ValidationSession
     	{
             System.setProperty("org.apache.xerces.xni.parser.XMLParserConfiguration", "org.apache.xerces.parsers.XMLGrammarCachingConfiguration");
             
-            parser = XMLReaderFactory.createXMLReader();
-            parser.setFeature( "http://xml.org/sax/features/validation", true );
-            parser.setFeature( "http://apache.org/xml/features/validation/schema", true );
+            XMLReader parent = XMLReaderFactory.createXMLReader();
+            parser = new MceXmlFilter( parent );
 
+            ArrayList<String> urls = new ArrayList<String>();
+            ArrayList<Source> schemaSources = new ArrayList<Source>();
+            
             Set< String > types = OOXMLSchemaMap.getContentTypes();
-            String locations = new String();
             for (String type : types)
             {
             	OOXMLSchemaMapping osm = OOXMLSchemaMap.getMappingForContentType( type );
-            	String schemaUrl = ClassLoader.getSystemResource( "schema/" + osm.getSchemaName() ).toString();
-            	
-            	if ( !osm.getNs().isEmpty() && !schemaUrl.isEmpty() )
-            	{
-	            	if (locations.length() > 0 )
-	            	{
-	            		locations += " ";
-	            	}
-	            	locations += osm.getNs() + " " + schemaUrl;
+            	if ( !osm.getSchemaName().isEmpty() && !urls.contains( osm.getSchemaName() ) ) {
+            		urls.add( osm.getSchemaName() );
+            		String schemaUrl = ClassLoader.getSystemResource( "schema/" + osm.getSchemaName() ).toString();
+
+            		if ( !schemaUrl.isEmpty() )
+            		{
+            			schemaSources.add( new StreamSource( schemaUrl ) );
+            		}
             	}
 			}
-            parser.setProperty( "http://apache.org/xml/properties/schema/external-schemaLocation", locations );
             
-            parser.setEntityResolver( new CachingEntityResolver() );
+            SchemaFactory schemaFactory = SchemaFactory.newInstance( XMLConstants.W3C_XML_SCHEMA_NS_URI );
+            schemaFactory.setResourceResolver( new CachingResourceResolver() );
+            Schema schema = schemaFactory.newSchema( schemaSources.toArray( new Source[schemaSources.size()] ) );
+            
+            validator = schema.newValidator();
     	}
     	catch ( Exception e )
     	{
@@ -220,13 +235,13 @@ public class OOXMLValidationSession extends ValidationSession
                 {
                     CommentatingErrorHandler h = new CommentatingErrorHandler( this
                             .getCommentary(), t.getName() );
-                    parser.setErrorHandler( h );
+                    validator.setErrorHandler( h );
 
                     String url = getUrlForEntry( t.getTargetAsPartName() ).toString();
                     logger.debug( "Validating: " + url + " using schema "
                                     + osm.getSchemaName() );
 
-                    parser.parse( url );
+                    validator.validate( new SAXSource( parser, new InputSource( url ) ) );
 
                     if( h.getInstanceErrCount() > 0 )
                     {

@@ -31,7 +31,9 @@ import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TestName;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
@@ -45,7 +47,10 @@ import org.xml.sax.helpers.XMLReaderFactory;
  */
 public class MceXmlFilterTest {
 	
+	@Rule public TestName name = new TestName();
+	
 	private MceXmlFilter mTested;
+	private CommentatingErrorHandler mErrorHandler;
 	
 	@Before
 	public void setup() throws Exception {
@@ -53,11 +58,13 @@ public class MceXmlFilterTest {
 		// Create the parser itself
 		XMLReader parent = XMLReaderFactory.createXMLReader();
         mTested = new MceXmlFilter( parent );
+        
+        mErrorHandler = new CommentatingErrorHandler( new StdioValidationReport( false ), name.getMethodName() );
+        mTested.setErrorHandler( mErrorHandler );
 	}
-
+	
 	@Test
 	public void testIgnorables() throws Exception {
-		
 		String test = "<aaa xmlns:ext=\"some-ext\" " +
 						   "xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" " +
                            "mc:Ignorable=\"ext\">" +
@@ -78,11 +85,220 @@ public class MceXmlFilterTest {
 		String actual = filter( test );
 		
 		assertEquals( expected, actual );
+		assertEquals( "Unexpected error during parse", 0, mErrorHandler.getInstanceErrCount() );
+	}
+	
+	@Test
+	public void testPreserveElements() throws Exception {
+		String test = "<aaa xmlns:ext=\"some-ext\" " +
+						   "xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" " +
+                           "mc:PreserveElements=\"ext:*\" />";
+		
+		
+		String expected = "<aaa xmlns:ext=\"some-ext\" "+
+                               "xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\"/>";
+		
+		String actual = filter( test );
+		
+		assertEquals( expected, actual );
+		assertEquals( "Unexpected error during parse", 0, mErrorHandler.getInstanceErrCount() );
+	}
+	
+	@Test
+	public void testPreserveAttributes() throws Exception {
+		String test = "<aaa xmlns:ext=\"some-ext\" " +
+						   "xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" " +
+                           "mc:PreserveAttributes=\"ext:*\" />";
+		
+		
+		String expected = "<aaa xmlns:ext=\"some-ext\" "+
+                               "xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\"/>";
+		
+		String actual = filter( test );
+		
+		assertEquals( expected, actual );
+		assertEquals( "Unexpected error during parse", 0, mErrorHandler.getInstanceErrCount() );
+	}
+	
+	@Test
+	public void testMustUnderstand() throws Exception {
+		String test = "<aaa xmlns:ext=\"some-ext\" " +
+						   "xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" " +
+                           "mc:MustUnderstand=\"\" />";
+		
+		
+		String expected = "<aaa xmlns:ext=\"some-ext\" "+
+                               "xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\"/>";
+		
+		String actual = filter( test );
+		
+		assertEquals( expected, actual );
+		assertEquals( "Unexpected error during parse", 0, mErrorHandler.getInstanceErrCount() );
+	}
+	
+	@Test
+	public void testChoiceNormal() throws Exception {
+		String test = "<aaa xmlns:ext=\"some-ext\" " +
+						   "xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\">" +
+                          "<mc:AlternateContent>" +
+                              "<mc:Choice Requires=\"ext\">" +
+                                  "<ext:foo/>" +
+                              "</mc:Choice>" +
+                          "</mc:AlternateContent>" +
+                      "</aaa>";
+		
+		
+		String expected = "<aaa xmlns:ext=\"some-ext\" "+
+                               "xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\"/>";
+		
+		String actual = filter( test );
+		
+		assertEquals( expected, actual );
+		assertEquals( "Unexpected error during parse, see run output for more details", 0, mErrorHandler.getInstanceErrCount() );
+	}
+	
+	@Test
+	public void testChoiceMissingRequires() throws Exception {
+		String test = "<aaa xmlns:ext=\"some-ext\" " +
+						   "xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\">" +
+                          "<mc:AlternateContent>" +
+                              "<mc:Choice />" +
+                          "</mc:AlternateContent>" +
+                      "</aaa>";
+		
+		
+		String expected = "<aaa xmlns:ext=\"some-ext\" "+
+                               "xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\"/>";
+		
+		String actual = filter( test );
+		
+		assertEquals( expected, actual );
+		assertEquals( "Missing Requires in <mc:Choice> should be reported", 1, mErrorHandler.getInstanceErrCount() );
+	}
+	
+	@Test
+	public void testChoicePrefixedRequires() throws Exception {
+		String test = "<aaa xmlns:ext=\"some-ext\" " +
+						   "xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\">" +
+                          "<mc:AlternateContent>" +
+                              "<mc:Choice mc:Requires=\"ext\"/>" +
+                          "</mc:AlternateContent>" +
+                      "</aaa>";
+		
+		
+		String expected = "<aaa xmlns:ext=\"some-ext\" "+
+                               "xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\"/>";
+		
+		String actual = filter( test );
+		
+		assertEquals( expected, actual );
+		assertEquals( "Prefixed Requires in <mc:Choice> should be reported", 2, mErrorHandler.getInstanceErrCount() );
+	}
+	
+	@Test
+	public void testChoiceUnprefixedIgnorables() throws Exception {
+		String test = "<aaa xmlns:ext=\"some-ext\" " +
+						   "xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\">" +
+                          "<mc:AlternateContent>" +
+                              "<mc:Choice Requires=\"ext\" Ignorables=\"ext\"/>" +
+                          "</mc:AlternateContent>" +
+                      "</aaa>";
+		
+		
+		String expected = "<aaa xmlns:ext=\"some-ext\" "+
+                               "xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\"/>";
+		
+		String actual = filter( test );
+		
+		assertEquals( expected, actual );
+		assertEquals( "Unprefixed Ignorables in <mc:Choice> should be reported", 1, mErrorHandler.getInstanceErrCount() );
+	}
+	
+	@Test
+	public void testChoiceXmlAttributes() throws Exception {
+		String test = "<aaa xmlns:ext=\"some-ext\" " +
+		                  "xmlns:xml=\"http://www.w3.org/XML/1998/namespace\" " + 
+						  "xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\">" +
+                          "<mc:AlternateContent>" +
+                              "<mc:Choice Requires=\"ext\" xml:lang=\"fr\" xml:space=\"preserve\"/>" +
+                          "</mc:AlternateContent>" +
+                      "</aaa>";
+		
+		
+		String expected = "<aaa xmlns:ext=\"some-ext\" "+
+		                       "xmlns:xml=\"http://www.w3.org/XML/1998/namespace\" " + 
+                               "xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\"/>";
+		
+		String actual = filter( test );
+		
+		assertEquals( expected, actual );
+		assertEquals( "xml:lang and xml:space in <mc:Choice> should be reported", 2, mErrorHandler.getInstanceErrCount() );
+	}
+	
+	@Test
+	public void testChoiceParent() throws Exception {
+		String test = "<aaa xmlns:ext=\"some-ext\" " +
+		                  "xmlns:xml=\"http://www.w3.org/XML/1998/namespace\" " + 
+						  "xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\">" +
+                              "<mc:Choice Requires=\"ext\"/>" +
+                      "</aaa>";
+		
+		
+		String expected = "<aaa xmlns:ext=\"some-ext\" "+
+		                       "xmlns:xml=\"http://www.w3.org/XML/1998/namespace\" " + 
+                               "xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\"/>";
+		
+		String actual = filter( test );
+		
+		assertEquals( expected, actual );
+		assertEquals( "<mc:Choice> with no <mc:AlternateContent> parent should be reported", 1, mErrorHandler.getInstanceErrCount() );
+	}
+	
+	@Test
+	public void testFallbackParent() throws Exception {
+		String test = "<aaa xmlns:ext=\"some-ext\" " +
+		                  "xmlns:xml=\"http://www.w3.org/XML/1998/namespace\" " + 
+						  "xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\">" +
+                              "<mc:Fallback/>" +
+                      "</aaa>";
+		
+		
+		String expected = "<aaa xmlns:ext=\"some-ext\" "+
+		                       "xmlns:xml=\"http://www.w3.org/XML/1998/namespace\" " + 
+                               "xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\"/>";
+		
+		String actual = filter( test );
+		
+		assertEquals( expected, actual );
+		assertEquals( "<mc:Fallback> with no <mc:AlternateContent> parent should be reported", 1, mErrorHandler.getInstanceErrCount() );
+	}
+	
+	@Test
+	public void testFallbackNormal() throws Exception {
+		String test = "<aaa xmlns:ext=\"some-ext\" " +
+						   "xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\">" +
+                          "<mc:AlternateContent>" +
+                              "<mc:Fallback mc:Ignorable=\"ext\">" +
+                                  "<ext:foo/>" +
+                                  "<bbb/>" +
+                              "</mc:Fallback>" +
+                          "</mc:AlternateContent>" +
+                      "</aaa>";
+		
+		
+		String expected = "<aaa xmlns:ext=\"some-ext\" "+
+                               "xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\">" +
+                              "<bbb/>" +
+                          "</aaa>";
+		
+		String actual = filter( test );
+		
+		assertEquals( expected, actual );
+		assertEquals( "Unexpected error during parse, see run output for more details", 0, mErrorHandler.getInstanceErrCount() );
 	}
 	
 	@Test
 	public void testProcessContent() throws Exception {
-		
 		String test = "<aaa xmlns:ext=\"some-ext\" " +
 						   "xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" " +
                            "mc:Ignorable=\"ext\" " +
@@ -106,11 +322,11 @@ public class MceXmlFilterTest {
 		String actual = filter( test );
 		
 		assertEquals( expected, actual );
+		assertEquals( "Unexpected error during parse", 0, mErrorHandler.getInstanceErrCount() );
 	}
 	
 	@Test
 	public void testProcessContentWildcar() throws Exception {
-		
 		String test = "<aaa xmlns:ext=\"some-ext\" " +
                            "xmlns:ext2=\"some-ext2\" " +
 						   "xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" " +
@@ -136,6 +352,7 @@ public class MceXmlFilterTest {
 		String actual = filter( test );
 		
 		assertEquals( expected, actual );
+		assertEquals( "Unexpected error during parse", 0, mErrorHandler.getInstanceErrCount() );
 	}
 
 	@Test

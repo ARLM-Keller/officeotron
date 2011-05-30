@@ -49,7 +49,7 @@ public class CommentatingErrorHandler implements ErrorHandler
         	String name = fragmentName;
         	
         	// Use the systemId when the error is located in the schemas (unlikely to happen)
-        	if ( !e.getSystemId().endsWith(fragmentName) )
+        	if ( e.getSystemId() != null && !e.getSystemId().endsWith(fragmentName) )
         		name = e.getSystemId();
         	String message = MessageFormat.format( "({0}:{1} col:{2}) {3}", name, e.getLineNumber(), e.getColumnNumber(), e.getMessage());
             commentary.addComment( "ERROR", message );

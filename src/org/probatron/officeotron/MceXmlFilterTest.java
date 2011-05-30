@@ -79,6 +79,64 @@ public class MceXmlFilterTest {
 		
 		assertEquals( expected, actual );
 	}
+	
+	@Test
+	public void testProcessContent() throws Exception {
+		
+		String test = "<aaa xmlns:ext=\"some-ext\" " +
+						   "xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" " +
+                           "mc:Ignorable=\"ext\" " +
+                           "mc:ProcessContent=\"ext:compat\">" +
+                          "<ext:bar>" +
+                              "<ccc>" +
+                                  "<ddd/>" +
+                              "</ccc>" +
+                              "<ext:compat>" +
+                                  "<eee/>" +
+                              "</ext:compat>" +
+                          "</ext:bar>" + 
+                      "</aaa>";
+		
+		
+		String expected = "<aaa xmlns:ext=\"some-ext\" "+
+                               "xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\">" +
+                              "<eee/>" +
+                          "</aaa>";
+		
+		String actual = filter( test );
+		
+		assertEquals( expected, actual );
+	}
+	
+	@Test
+	public void testProcessContentWildcar() throws Exception {
+		
+		String test = "<aaa xmlns:ext=\"some-ext\" " +
+                           "xmlns:ext2=\"some-ext2\" " +
+						   "xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" " +
+                           "mc:Ignorable=\"ext\" " +
+                           "mc:ProcessContent=\"ext2:*\">" +
+                          "<ext:bar>" +
+                              "<ccc>" +
+                                  "<ddd/>" +
+                              "</ccc>" +
+                              "<ext2:compat>" +
+                                  "<eee/>" +
+                              "</ext2:compat>" +
+                          "</ext:bar>" + 
+                      "</aaa>";
+		
+		
+		String expected = "<aaa xmlns:ext=\"some-ext\" "+
+                               "xmlns:ext2=\"some-ext2\" " +
+                               "xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\">" +
+                              "<eee/>" +
+                          "</aaa>";
+		
+		String actual = filter( test );
+		
+		assertEquals( expected, actual );
+	}
 
 	@Test
 	public void testNormalizeSpace() {

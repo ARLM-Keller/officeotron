@@ -19,9 +19,12 @@ package org.probatron.officeotron;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Stack;
+
+import javax.xml.namespace.QName;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -46,15 +49,19 @@ public class MceXmlFilter extends XMLFilterImpl {
 		String localName;
 		String qName;
 		
-		ArrayList<String> elements;
+		ArrayList<String> ignorableValue;
+		ArrayList<QName> processContentValue;
+		
 		boolean ignoreContent = false;
+		boolean processContent = false;
 		
 		public ElementInfos( String pUri, String pLocalName, String pQName ) {
 			uri = pUri;
 			localName = pLocalName;
 			qName = pQName;
 			
-			elements = new ArrayList<String>();
+			ignorableValue = new ArrayList<String>();
+			processContentValue = new ArrayList<QName>();
 		}
 		
 		public boolean isElement( String pUri, String pLocalName, String pQName ) {
@@ -68,8 +75,10 @@ public class MceXmlFilter extends XMLFilterImpl {
 
 	private static final String MCE_NAMESPACE = "http://schemas.openxmlformats.org/markup-compatibility/2006";
 	private static final String ATTR_IGNORABLE = "Ignorable";
+	private static final String ATTR_PROCESS_CONTENT = "ProcessContent";
 	
 	private Stack<ElementInfos> mInfos;
+	private HashMap<String, String> mPrefixes;
 	
 	
 	public MceXmlFilter(XMLReader parent) {
@@ -82,9 +91,23 @@ public class MceXmlFilter extends XMLFilterImpl {
 		
 		// Reset the ignorables for the document
 		mInfos = new Stack<ElementInfos>();
+		mPrefixes = new HashMap<String, String>();
+		
 		super.startDocument();
 	}
 	
+	@Override
+	public void startPrefixMapping(String prefix, String uri)
+			throws SAXException {
+		mPrefixes.put( prefix, uri );
+		super.startPrefixMapping(prefix, uri);
+	}
+	
+	@Override
+	public void endPrefixMapping(String prefix) throws SAXException {
+		super.endPrefixMapping(prefix);
+		mPrefixes.remove( prefix );
+	}
 
 	@Override
 	public void startElement(String uri, String localName, String qName,
@@ -94,20 +117,30 @@ public class MceXmlFilter extends XMLFilterImpl {
 		
 		ElementInfos infos = new ElementInfos( uri, localName, qName );
 		
-		// Is there an Ignorable attribute? If yes, store its values
+		// Is there an Ignorable attribute?
 		String names = atts.getValue( MCE_NAMESPACE, ATTR_IGNORABLE );
 		if ( names != null ) {
 			String[] namesArr = normalizeWhitespaces( names ).split( " " );
-			infos.elements.addAll( Arrays.asList( namesArr ) );
+			infos.ignorableValue.addAll( Arrays.asList( namesArr ) );
 		}
-		mInfos.push( infos );
+		
+		// Is there a ProcessContent attribute?
+		String processContent = atts.getValue( MCE_NAMESPACE, ATTR_PROCESS_CONTENT );
+		if ( processContent != null ) {
+			String[] items = normalizeWhitespaces( processContent ).split( " " );
+			for ( String item : items ) {
+				infos.processContentValue.add( parsePrefixedName( item ) );
+			}
+		}
 		
 		// Is the current element to be ignored?
 		boolean ignoreThis = isIgnorable( qName, ignorables );
-		infos.ignoreContent = ignoreThis; // TODO This should be altered by the PreserveContent
+		infos.ignoreContent = ignoreThis;
+		infos.processContent = isProcessContent( uri, localName );
+		
 		
 		// Is the element in content to be ignored or not?
-		if ( !ignoreThis && !isIgnoredContent( ) ) {
+		if ( !ignoreThis && !isInIgnoredContent() ) {
 			
 			// Cleanup all attributes
 			AttributesImpl newAtts = new AttributesImpl( );
@@ -123,7 +156,7 @@ public class MceXmlFilter extends XMLFilterImpl {
 	
 	            if ( !removeAttr ) {
 	            	// Remove the MCE attributes if any
-	            	if ( MCE_NAMESPACE.equals( attrUri ) && ATTR_IGNORABLE.equals( attrName ) ) {
+	            	if ( MCE_NAMESPACE.equals( attrUri ) ) {
 	            		removeAttr = true;
 	            	}
 	            }
@@ -138,20 +171,9 @@ public class MceXmlFilter extends XMLFilterImpl {
 			
 			super.startElement(uri, localName, qName, newAtts);
 		}
+		
+		mInfos.push( infos );
 	}
-
-	private boolean isIgnoredContent() {
-		
-		boolean ignoreContent = false;
-		Iterator< ElementInfos > it = mInfos.iterator();
-		
-		while ( !ignoreContent && it.hasNext() ) {
-			ignoreContent = it.next().ignoreContent;
-		}
-		
-		return ignoreContent;
-	}
-
 
 	@Override
 	public void endElement(String uri, String localName, String qName)
@@ -164,7 +186,7 @@ public class MceXmlFilter extends XMLFilterImpl {
 		List<String> ignorables = getCurrentIgnorables();
 		
 		// Is the element to be ignored?
-		if ( !isIgnorable( qName, ignorables ) && !isIgnoredContent() ) {
+		if ( !isIgnorable( qName, ignorables ) && !isInIgnoredContent() ) {
 			super.endElement(uri, localName, qName);
 		}
 	}
@@ -173,7 +195,7 @@ public class MceXmlFilter extends XMLFilterImpl {
 		ArrayList<String> ignorables = new ArrayList<String>();
 		
 		for ( ElementInfos names : mInfos ) {
-			for ( String name : names.elements ) {
+			for ( String name : names.ignorableValue ) {
 				if ( !ignorables.contains( name ) ) {
 					ignorables.add( name );
 				}
@@ -203,5 +225,71 @@ public class MceXmlFilter extends XMLFilterImpl {
 			}
 		}
 		return result;
+	}
+	
+	private boolean isProcessContent(String uri, String localName) {
+		
+		boolean processContent = false;
+		Iterator< ElementInfos > infosIt = mInfos.iterator();
+		
+		while ( !processContent && infosIt.hasNext() ) {
+			ArrayList<QName> values = infosIt.next().processContentValue;
+			Iterator<QName> valuesIt = values.iterator();
+			
+			while ( !processContent && valuesIt.hasNext() ) {
+				QName toMatch = valuesIt.next();
+				boolean matchesUri = toMatch.getNamespaceURI().equals( uri );
+				boolean matchesLocal = toMatch.getLocalPart().equals( localName ) ||
+						toMatch.getLocalPart().equals( "*" );
+				
+				processContent = matchesUri && matchesLocal;
+			}
+		}
+		
+		return processContent;
+	}
+
+
+	private boolean isInIgnoredContent() {
+		
+		boolean ignoreContent = false;
+		Iterator< ElementInfos > it = mInfos.iterator();
+		
+		while ( it.hasNext() ) {
+			ElementInfos infos = it.next();
+			if ( infos.ignoreContent )
+				ignoreContent = true;
+			if ( ignoreContent && infos.processContent )
+				ignoreContent = false;
+		}
+		
+		return ignoreContent;
+	}
+	
+	/**
+	 * Parse an XML name and create a QName of it y resolving the prefix if needed.
+	 *  
+	 * @param pPrefixed a string like "xmlns:my" or "my"
+	 * 
+	 * @return the corresponding QName or <code>null</code> if the string doesn't
+	 * 		match the pattern.
+	 */
+	private QName parsePrefixedName( String pPrefixed ) {
+		QName qname = null; 
+		String[] split = pPrefixed.split( ":" );
+		
+		if ( split.length <= 2 ) {
+			String uri = new String();
+			String prefix = new String();
+			String localname = split[0];
+
+			if ( split.length == 2 ) {
+				prefix = split[0];
+				uri = mPrefixes.get( prefix );
+				localname = split[1];
+			}
+			qname = new QName( uri, localname, prefix );
+		}
+		return qname;
 	}
 }

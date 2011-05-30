@@ -71,11 +71,8 @@ public class WebTask implements Runnable
             }
             catch( IOException e )
             {
-
                 e.printStackTrace();
             }
-
-            vs.cleanup();
             return;
         }
 

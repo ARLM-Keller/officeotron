@@ -191,6 +191,15 @@ public class MceXmlFilter extends XMLFilterImpl {
 	}
 
 	@Override
+	public void characters(char[] ch, int start, int length)
+			throws SAXException {
+		if (!isInIgnoredContent())
+		{
+			super.characters(ch, start, length);
+		}
+	};
+
+	@Override
 	public void endElement(String uri, String localName, String qName)
 			throws SAXException {
 

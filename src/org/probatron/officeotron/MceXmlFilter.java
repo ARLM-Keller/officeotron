@@ -76,6 +76,7 @@ public class MceXmlFilter extends XMLFilterImpl {
 
 	private static final String NS_XML = "http://www.w3.org/XML/1998/namespace";
 	private static final String NS_MCE = "http://schemas.openxmlformats.org/markup-compatibility/2006";
+	private static final String TAG_XML = "xml";
 	private static final String ATTR_IGNORABLE = "Ignorable";
 	private static final String ATTR_PROCESS_CONTENT = "ProcessContent";
 	private static final String TAG_ALTERNATE_CONTENT = "AlternateContent";
@@ -88,6 +89,7 @@ public class MceXmlFilter extends XMLFilterImpl {
 	private Stack<ElementInfos> mInfos;
 	private HashMap<String, String> mPrefixes;
 	private Locator mLocator;
+	private boolean mVMLStream = false;
 	
 	
 	public MceXmlFilter(XMLReader parent) {
@@ -98,6 +100,11 @@ public class MceXmlFilter extends XMLFilterImpl {
 	public void setDocumentLocator(Locator locator) {
 		mLocator = locator;
 		super.setDocumentLocator(locator);
+	}
+	
+	public void setVMLStream(boolean VMLStream)
+	{
+		mVMLStream = VMLStream;
 	}
 
 	@Override
@@ -149,8 +156,23 @@ public class MceXmlFilter extends XMLFilterImpl {
 			}
 		}
 		
+		boolean ignoreFirstVMLElement = false;
+		if(mVMLStream && mInfos.empty())
+		{
+			if (!qName.equals(TAG_XML))
+			{
+				// make sure that the first element is <xml>: 8.1 (Part 4)
+				SAXParseException e = new SAXParseException( "VML streams need to start with <xml>: 8.1 (Part 4)", mLocator );
+				getErrorHandler().error( e );
+			}
+			else
+			{
+				ignoreFirstVMLElement = true;
+			}
+		}
+
 		// Is the current element to be ignored?
-		boolean ignoreThis = isIgnorable( qName, ignorables );
+		boolean ignoreThis = ignoreFirstVMLElement || isIgnorable( qName, ignorables );
 		infos.ignoreContent = ignoreThis;
 		infos.processContent = isProcessContent( uri, localName );
 		
@@ -212,7 +234,7 @@ public class MceXmlFilter extends XMLFilterImpl {
 		boolean mceElement = checkMceElement( uri, localName, qName, null );
 		
 		// Is the element to be ignored?
-		if ( !isIgnorable( qName, ignorables ) && !isInIgnoredContent() && !mceElement ) {
+		if ( !isIgnorable( qName, ignorables ) && !isInIgnoredContent() && !mceElement) {
 			super.endElement(uri, localName, qName);
 		}
 	}
@@ -352,6 +374,10 @@ public class MceXmlFilter extends XMLFilterImpl {
 	}
 	
 	private boolean isIgnorable(String pAttrQName, List<String> pIgnorables) {
+		if (mVMLStream && pAttrQName.equals(TAG_XML)) {
+			return true;
+		}
+
 		boolean result = false;
 		for (String ignorable : pIgnorables) {
 			if ( pAttrQName.startsWith( ignorable + ":" ) ) {

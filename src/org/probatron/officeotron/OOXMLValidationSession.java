@@ -45,7 +45,7 @@ public class OOXMLValidationSession extends ValidationSession
 {
     static Logger logger = Logger.getLogger( OOXMLValidationSession.class );
 
-    static XMLReader parser;
+    static MceXmlFilter parser;
 	static Validator validator;
     
     static
@@ -241,6 +241,7 @@ public class OOXMLValidationSession extends ValidationSession
                     logger.debug( "Validating: " + url + " using schema "
                                     + osm.getSchemaName() );
 
+                    parser.setVMLStream(osm.getSchemaName().contains("vml"));
                     validator.validate( new SAXSource( parser, new InputSource( url ) ) );
 
                     if( h.getInstanceErrCount() > 0 )
